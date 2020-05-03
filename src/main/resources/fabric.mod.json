@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "slight-gui-modifications",
+  "version": "${version}",
+  "name": "'Slight' GUI Modifications",
+  "icon": "icon.png",
+  "description": "Slightly alternate the gui a bit :)\nVisit the CurseForge page for list of features.\nSuggest features to add in our discord!",
+  "environment": "client",
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/slight-gui-modifications",
+    "issues": "https://discord.gg/rbxu4Fk"
+  },
+  "entrypoints": {
+    "modmenu": [
+      "me.shedaniel.slightguimodifications.modmenu.SlightGuiModificationsMM"
+    ],
+    "client": [
+      "me.shedaniel.slightguimodifications.SlightGuiModifications"
+    ],
+    "mm:early_risers": [
+      "me.shedaniel.slightguimodifications.asm.SlightGuiModificationsAsm"
+    ]
+  },
+  "accessWidener": "slight-gui-modifications.aw",
+  "mixins": [
+    "slight-gui-modifications.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.8+build.189"
+  }
+}

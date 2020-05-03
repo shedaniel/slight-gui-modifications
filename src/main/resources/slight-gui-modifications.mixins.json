@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "me.shedaniel.slightguimodifications.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "plugin": "me.shedaniel.slightguimodifications.asm.SlightGuiModificationsMixinPlugin",
+  "client": [
+    "MixinBookEditScreen", "MixinCubeMapRenderer", "MixinDrawableHelper", "MixinEntryListWidget", "MixinGameRenderer", "MixinInGameHud", "MixinInventoryScreen",
+    "MixinItemRenderer", "MixinMinecraftClient", "MixinMultiplayerServerListWidget$ServerEntry", "MixinScreen", "MixinSettingsScreen", "MixinTextFieldWidget",
+    "MixinTextRenderer", "MixinTitleScreen", "MixinToastManager", "MixinWorldListWidget$Entry", "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl",
+    "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
