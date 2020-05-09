@@ -31,8 +31,9 @@ public class MixinDrawableHelper {
         }
     }
     
-    @Inject(method = "innerBlit(IIIIIFFFF)V", at = @At("HEAD"))
+    @Inject(method = "innerBlit(IIIIIFFFF)V", at = @At("RETURN"))
     private static void postInnerBlit(int xStart, int xEnd, int yStart, int yEnd, int z, float uStart, float uEnd, float vStart, float vEnd, CallbackInfo ci) {
         RenderSystem.popMatrix();
+        SlightGuiModifications.restoreAlpha();
     }
 }

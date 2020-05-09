@@ -23,12 +23,14 @@ public class SlightGuiModificationsConfig implements ConfigData {
     @ConfigEntry.Gui.CollapsibleObject public TextFieldModifications textFieldModifications = new TextFieldModifications();
     @ConfigEntry.Gui.CollapsibleObject public DebugInformation debugInformation = new DebugInformation();
     @ConfigEntry.Gui.CollapsibleObject public CustomScaling customScaling = new CustomScaling();
+    @ConfigEntry.Gui.CollapsibleObject public SlotHighlight slotHighlight = new SlotHighlight();
     @Comment("Whether GUI should allow right click actions.") @ConfigEntry.Gui.Tooltip() public boolean rightClickActions = false;
     
     public static class OpeningAnimation {
+        public boolean fluidChatOpening = false;
         public boolean fluidOpenSlideFromBottom = false;
         public boolean fluidOpenFade = false;
-        @ConfigEntry.BoundedDiscrete(min = 10, max = 1000) @ConfigEntry.Gui.Excluded public int fluidAnimationDuration = 400;
+        @ConfigEntry.BoundedDiscrete(min = 10, max = 5000) public int fluidAnimationDuration = 400;
         public boolean affectsGameMenus = true;
         public boolean affectsInventories = true;
         public boolean ignoreSlideWhenRedirected = true;
@@ -69,6 +71,11 @@ public class SlightGuiModificationsConfig implements ConfigData {
     
     public static class CustomScaling {
         @ScaleSlider public double scale = 1;
+    }
+    
+    public static class SlotHighlight {
+        public boolean enabled = false;
+        @ConfigEntry.ColorPicker(allowAlpha = true) public int color = 0x80ffffff;
     }
     
     @Retention(RetentionPolicy.RUNTIME)

@@ -1,6 +1,7 @@
 package me.shedaniel.slightguimodifications;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
@@ -35,12 +36,35 @@ import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
 public class SlightGuiModifications implements ClientModInitializer {
     public static float backgroundTint = 0;
     public static final Identifier TEXT_FIELD_TEXTURE = new Identifier("textures/gui/text_field.png");
+    public static float lastAlpha = -1;
     
-    public static void setAlpha(float alpha) {RenderSystem.color4f(1, 1, 1, alpha);}
+    public static void setAlpha(float alpha) {
+        if (lastAlpha >= 0) new IllegalStateException().fillInStackTrace();
+        lastAlpha = GlStateManager.COLOR.alpha == -1 ? 1 : MathHelper.clamp(GlStateManager.COLOR.alpha, 0, 1);
+//        System.out.println(lastAlpha * alpha);
+//        if (lastAlpha * alpha == 0) new RuntimeException(lastAlpha + " " + alpha).printStackTrace();
+        RenderSystem.color4f(GlStateManager.COLOR.red == -1 ? 1 : GlStateManager.COLOR.red,
+                GlStateManager.COLOR.green == -1 ? 1 : GlStateManager.COLOR.green,
+                GlStateManager.COLOR.blue == -1 ? 1 : GlStateManager.COLOR.blue,
+                lastAlpha * alpha);
+    }
     
-    public static float ease(float t) {return (float) (1f * (-Math.pow(2, -10 * t / 1f) + 1));}
+    public static void restoreAlpha() {
+        if (lastAlpha < 0) return;
+        RenderSystem.color4f(GlStateManager.COLOR.red == -1 ? 1 : GlStateManager.COLOR.red,
+                GlStateManager.COLOR.green == -1 ? 1 : GlStateManager.COLOR.green,
+                GlStateManager.COLOR.blue == -1 ? 1 : GlStateManager.COLOR.blue,
+                lastAlpha);
+        lastAlpha = -1;
+    }
     
-    public static int reverseYAnimation(int y) {return y - applyYAnimation(y) + y;}
+    public static float ease(float t) {
+        return (float) (1f * (-Math.pow(2, -10 * t / 1f) + 1));
+    }
+    
+    public static int reverseYAnimation(int y) {
+        return y - applyYAnimation(y) + y;
+    }
     
     public static int applyYAnimation(int y) {
         Screen screen = MinecraftClient.getInstance().currentScreen;
@@ -55,7 +79,7 @@ public class SlightGuiModifications implements ClientModInitializer {
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedMouseY();
-            if (alpha >= 0) return y + (int) ((1 - alpha) * screen.height / 2);
+            if (alpha >= 0) return y - (int) ((1 - alpha) * screen.height / 2);
         }
         return y;
     }
@@ -135,7 +159,9 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     public static SlightGuiModificationsConfig getConfig() {return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig();}
     
-    public static float getSpeed() {return MathHelper.clamp(getConfig().openingAnimation.fluidAnimationDuration, 10, 1000);}
+    public static float getSpeed() {
+        return getConfig().openingAnimation.fluidAnimationDuration;
+    }
     
     @SuppressWarnings("deprecation")
     public static Screen getConfigScreen(Screen parent) {

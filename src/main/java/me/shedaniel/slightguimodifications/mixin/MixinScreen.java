@@ -45,6 +45,8 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
     @Unique
     private long fadeStart = -1;
     @Unique
+    private long currentFade = -1;
+    @Unique
     private int renderingState = 0;
     @Unique
     private Screen lastScreen;
@@ -74,6 +76,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
         this.fade = affected && config.openingAnimation.fluidOpenFade && (lastScreen == null || lastScreen instanceof TitleScreen || !config.openingAnimation.ignoreFadeWhenRedirected);
         if (this.slide || this.fade) {
             this.fadeStart = Util.getMeasuringTimeMs();
+            this.currentFade = Util.getMeasuringTimeMs() - fadeStart;
             this.lastScreen = lastScreen;
             if (this.lastScreen instanceof AnimationListener && this.lastScreen != (AnimationListener) this)
                 ((AnimationListener) this.lastScreen).slightguimodifications_reset();
@@ -90,19 +93,19 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
     
     @Override
     public float slightguimodifications_getAlpha() {
-        if (renderingState == 1) return 1;
-        return renderingState == 2 && fadeStart >= 0 && fade ? Math.min((Util.getMeasuringTimeMs() - fadeStart) / SlightGuiModifications.getSpeed(), 1f) : -1;
+        if (renderingState == 1 || renderingState == 3) return 1;
+        return renderingState == 2 && fadeStart >= 0 && fade ? Math.min(currentFade / SlightGuiModifications.getSpeed(), 1f) : -1;
     }
     
     @Override
     public float slightguimodifications_getEasedYOffset() {
         if (renderingState == 1) return 1;
-        return renderingState == 2 ? slightguimodifications_getEasedMouseY() : -1;
+        return renderingState == 2 || renderingState == 3 ? slightguimodifications_getEasedMouseY() : -1;
     }
     
     @Override
     public float slightguimodifications_getEasedMouseY() {
-        return fadeStart >= 0 && slide ? SlightGuiModifications.ease(Math.min((Util.getMeasuringTimeMs() - fadeStart) / SlightGuiModifications.getSpeed(), 1f)) : -1;
+        return fadeStart >= 0 && slide ? SlightGuiModifications.ease(Math.min(currentFade / SlightGuiModifications.getSpeed(), 1f)) : -1;
     }
     
     @Override
@@ -122,11 +125,18 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
 //            }
 //        }
         this.renderingState = 2;
+        if (fadeStart != -1) {
+            this.currentFade = Util.getMeasuringTimeMs() - fadeStart;
+        }
     }
     
     @Override
     public void slightguimodifications_stopRendering() {
         this.renderingState = 0;
+        if (runnable != null) {
+            runnable.run();
+            runnable = null;
+        }
     }
     
     @Override
@@ -137,6 +147,11 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
     @Override
     public void slightguimodifications_setAnimationState(int stage) {
         this.renderingState = stage;
+    }
+    
+    @Override
+    public void slightguimodifications_setCurrentFade(long currentFade) {
+        this.currentFade = currentFade;
     }
     
     @Redirect(method = "renderBackground(I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;fillGradient(IIIIII)V"))
@@ -155,44 +170,19 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
         } else fillGradient(top, left, right, bottom, color1, color2);
     }
     
-    /*
+    
     @Inject(method = "renderDirtBackground",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;begin(ILnet/minecraft/client/render/VertexFormat;)V", ordinal = 0))
     private void preRenderDirtBackground(int alpha, CallbackInfo ci) {
-        RenderSystem.pushMatrix();
-        if (this instanceof AnimationListener && this.renderingState == 2) {
-            SlightGuiModifications.backgroundTint = Math.min(SlightGuiModifications.backgroundTint + minecraft.getLastFrameDuration() * 8, SlightGuiModifications.getSpeed() / 20f);
-            float f = Math.min(SlightGuiModifications.backgroundTint / SlightGuiModifications.getSpeed() * 20f, 1f);
-            if (f >= 0) {
-                RenderSystem.enableBlend();
-                RenderSystem.disableAlphaTest();
-                RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-                RenderSystem.shadeModel(GL11.GL_SMOOTH);
-                SlightGuiModifications.setAlpha(Math.min(SlightGuiModifications.backgroundTint / SlightGuiModifications.getSpeed() * 20f, 1f));
-                this.renderingState = 0;
-            }
+        if (this.renderingState == 2) {
+            this.renderingState = 0;
         }
     }
     
     @Inject(method = "renderDirtBackground",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", ordinal = 0))
     private void postRenderDirtBackground(int alpha, CallbackInfo ci) {
-        if (this instanceof AnimationListener) {
-            float f = Math.min(SlightGuiModifications.backgroundTint / SlightGuiModifications.getSpeed() * 20f, 1f);
-            if (f >= 0) {
-                this.renderingState = 2;
-            }
-        }
-        RenderSystem.popMatrix();
-    }
-     */
-    
-    @Inject(method = "render", at = @At("RETURN"))
-    private void postRender(int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (runnable != null) {
-            runnable.run();
-            runnable = null;
-        }
+        this.renderingState = 2;
     }
     
     @Override

@@ -10,7 +10,14 @@ import java.util.List;
 import java.util.Set;
 
 public class SlightGuiModificationsMixinPlugin implements IMixinConfigPlugin {
-    private static final ImmutableMap<String, String[]> MIXIN_REQUIRES_MODS = ImmutableMap.<String, String[]>builder().put("MixinRecipeViewingScreen", new String[]{"roughlyenoughitems"}).put("MixinVillagerRecipeViewingScreen", new String[]{"roughlyenoughitems"}).put("MixinREITextFieldWidget", new String[]{"roughlyenoughitems"}).put("MixinScissorsHandlerImpl", new String[]{"cloth-config2"}).build();
+    private static final ImmutableMap<String, String[]> MIXIN_REQUIRES_MODS = ImmutableMap.<String, String[]>builder()
+            .put("MixinRecipeViewingScreen", new String[]{"roughlyenoughitems"})
+            .put("MixinVillagerRecipeViewingScreen", new String[]{"roughlyenoughitems"})
+            .put("MixinREITextFieldWidget", new String[]{"roughlyenoughitems"})
+            .put("MixinScissorsHandlerImpl", new String[]{"cloth-config2"})
+            .put("MixinModsScreen", new String[]{"modmenu"})
+            .put("MixinModListWidget", new String[]{"modmenu"})
+            .build();
     
     @Override
     public void onLoad(String mixinPackage) {}

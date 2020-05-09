@@ -20,4 +20,6 @@ public interface AnimationListener {
     int slightguimodifications_getAnimationState();
     
     void slightguimodifications_setAnimationState(int stage);
+    
+    void slightguimodifications_setCurrentFade(long currentFade);
 }
