@@ -17,7 +17,7 @@ public class MixinEntryListWidget {
     @Shadow @Final protected MinecraftClient minecraft;
     
     @Inject(method = "renderHoleBackground",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;begin(ILnet/minecraft/client/render/VertexFormat;)V"))
+            at = @At(value = "HEAD"))
     private void preRenderHoleBackground(int top, int bottom, int alphaTop, int alphaBottom, CallbackInfo ci) {
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
@@ -43,7 +43,7 @@ public class MixinEntryListWidget {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", shift = At.Shift.BY, by = 2))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", shift = At.Shift.AFTER))
     private void postBufferDraw(int mouseX, int mouseY, float delta, CallbackInfo ci) {
         RenderSystem.popMatrix();
     }

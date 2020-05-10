@@ -35,7 +35,7 @@ public class MixinModListWidget extends EntryListWidget {
     }
     
     @Inject(method = "renderList",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", shift = At.Shift.BY, by = 2))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", shift = At.Shift.AFTER))
     private void postSelectionBufferDraw(int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         RenderSystem.popMatrix();
         SlightGuiModifications.restoreAlpha();

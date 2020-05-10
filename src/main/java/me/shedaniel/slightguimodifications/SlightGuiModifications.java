@@ -15,6 +15,7 @@ import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -26,8 +27,10 @@ import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Lazy;
 import net.minecraft.util.math.MathHelper;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.getUnsafely;
@@ -38,22 +41,111 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static final Identifier TEXT_FIELD_TEXTURE = new Identifier("textures/gui/text_field.png");
     public static float lastAlpha = -1;
     
+    private static final Lazy<Object> COLOR_OBJ = new Lazy<>(() -> {
+        try {
+            Field field = GlStateManager.class.getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493", "field_20487", "Lnet/minecraft/class_4493$class_1020;"));
+            field.setAccessible(true);
+            return field.get(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    private static final Lazy<Field> RED_FIELD = new Lazy<>(() -> {
+        try {
+            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5057", "F"));
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    private static final Lazy<Field> GREEN_FIELD = new Lazy<>(() -> {
+        try {
+            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5056", "F"));
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    private static final Lazy<Field> BLUE_FIELD = new Lazy<>(() -> {
+        try {
+            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5055", "F"));
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    private static final Lazy<Field> ALPHA_FIELD = new Lazy<>(() -> {
+        try {
+            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5054", "F"));
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+    
+    public static Object getColorObj() {
+        return COLOR_OBJ.get();
+    }
+    
+    public static float getColorRed(Object colorObj) {
+        try {
+            return (float) RED_FIELD.get().get(colorObj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static float getColorGreen(Object colorObj) {
+        try {
+            return (float) GREEN_FIELD.get().get(colorObj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static float getColorBlue(Object colorObj) {
+        try {
+            return (float) BLUE_FIELD.get().get(colorObj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static float getColorAlpha(Object colorObj) {
+        try {
+            return (float) ALPHA_FIELD.get().get(colorObj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public static void setAlpha(float alpha) {
-        if (lastAlpha >= 0) new IllegalStateException().fillInStackTrace();
-        lastAlpha = GlStateManager.COLOR.alpha == -1 ? 1 : MathHelper.clamp(GlStateManager.COLOR.alpha, 0, 1);
-//        System.out.println(lastAlpha * alpha);
-//        if (lastAlpha * alpha == 0) new RuntimeException(lastAlpha + " " + alpha).printStackTrace();
-        RenderSystem.color4f(GlStateManager.COLOR.red == -1 ? 1 : GlStateManager.COLOR.red,
-                GlStateManager.COLOR.green == -1 ? 1 : GlStateManager.COLOR.green,
-                GlStateManager.COLOR.blue == -1 ? 1 : GlStateManager.COLOR.blue,
+        if (lastAlpha >= 0) new IllegalStateException().printStackTrace();
+        Object colorObj = getColorObj();
+        float colorRed = getColorRed(colorObj);
+        float colorGreen = getColorGreen(colorObj);
+        float colorBlue = getColorBlue(colorObj);
+        float colorAlpha = getColorAlpha(colorObj);
+        lastAlpha = colorAlpha == -1 ? 1 : MathHelper.clamp(colorAlpha, 0, 1);
+        RenderSystem.color4f(colorRed == -1 ? 1 : colorRed,
+                colorGreen == -1 ? 1 : colorGreen,
+                colorBlue == -1 ? 1 : colorBlue,
                 lastAlpha * alpha);
     }
     
     public static void restoreAlpha() {
         if (lastAlpha < 0) return;
-        RenderSystem.color4f(GlStateManager.COLOR.red == -1 ? 1 : GlStateManager.COLOR.red,
-                GlStateManager.COLOR.green == -1 ? 1 : GlStateManager.COLOR.green,
-                GlStateManager.COLOR.blue == -1 ? 1 : GlStateManager.COLOR.blue,
+        Object colorObj = getColorObj();
+        float colorRed = getColorRed(colorObj);
+        float colorGreen = getColorGreen(colorObj);
+        float colorBlue = getColorBlue(colorObj);
+        RenderSystem.color4f(colorRed == -1 ? 1 : colorRed,
+                colorGreen == -1 ? 1 : colorGreen,
+                colorBlue == -1 ? 1 : colorBlue,
                 lastAlpha);
         lastAlpha = -1;
     }

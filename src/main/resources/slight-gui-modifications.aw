@@ -7,5 +7,3 @@ accessible field net/minecraft/client/gui/screen/world/SelectWorldScreen levelLi
 accessible field net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen selectedEntry Lnet/minecraft/client/network/ServerInfo;
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen editEntry (Z)V
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen removeEntry (Z)V
-accessible field com/mojang/blaze3d/platform/GlStateManager COLOR Lcom/mojang/blaze3d/platform/GlStateManager$Color4;
-accessible class com/mojang/blaze3d/platform/GlStateManager$Color4

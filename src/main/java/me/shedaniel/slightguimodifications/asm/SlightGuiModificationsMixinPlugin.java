@@ -11,6 +11,7 @@ import java.util.Set;
 
 public class SlightGuiModificationsMixinPlugin implements IMixinConfigPlugin {
     private static final ImmutableMap<String, String[]> MIXIN_REQUIRES_MODS = ImmutableMap.<String, String[]>builder()
+            .put("MixinOverlaySearchField", new String[]{"roughlyenoughitems"})
             .put("MixinRecipeViewingScreen", new String[]{"roughlyenoughitems"})
             .put("MixinVillagerRecipeViewingScreen", new String[]{"roughlyenoughitems"})
             .put("MixinREITextFieldWidget", new String[]{"roughlyenoughitems"})

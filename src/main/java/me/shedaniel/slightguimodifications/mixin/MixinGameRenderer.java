@@ -37,7 +37,7 @@ public class MixinGameRenderer {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V", ordinal = 0, shift = At.Shift.BY, by = 2))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V", ordinal = 0, shift = At.Shift.AFTER))
     private void postRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         Screen screen = client.currentScreen;
         if (screen instanceof AnimationListener)
