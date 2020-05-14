@@ -25,6 +25,8 @@ import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.options.SoundOptionsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
@@ -40,6 +42,12 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static float backgroundTint = 0;
     public static final Identifier TEXT_FIELD_TEXTURE = new Identifier("textures/gui/text_field.png");
     public static float lastAlpha = -1;
+    public static boolean prettyScreenshots = false;
+    public static NativeImageBackedTexture prettyScreenshotTexture = null;
+    public static NativeImageBackedTexture lastPrettyScreenshotTexture = null;
+    public static Identifier prettyScreenshotTextureId = null;
+    public static Identifier lastPrettyScreenshotTextureId = null;
+    public static long prettyScreenshotTime = -1;
     
     private static final Lazy<Object> COLOR_OBJ = new Lazy<>(() -> {
         try {
@@ -196,6 +204,20 @@ public class SlightGuiModifications implements ClientModInitializer {
         return alpha;
     }
     
+    public static void startPrettyScreenshot(NativeImage cloneImage) {
+        if (prettyScreenshotTexture != null) {
+            lastPrettyScreenshotTexture = prettyScreenshotTexture;
+            lastPrettyScreenshotTextureId = prettyScreenshotTextureId;
+        }
+        prettyScreenshotTexture = null;
+        prettyScreenshotTextureId = null;
+        prettyScreenshotTime = -1;
+        if (cloneImage != null) {
+            prettyScreenshotTexture = new NativeImageBackedTexture(cloneImage);
+            prettyScreenshotTextureId = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("slight-gui-modifications-pretty-screenshots", prettyScreenshotTexture);
+        }
+    }
+    
     @Override
     public void onInitializeClient() {
         AutoConfig.register(SlightGuiModificationsConfig.class, JanksonConfigSerializer::new);
@@ -247,6 +269,18 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             return ActionResult.PASS;
         });
+    }
+    
+    public static double bezierEase(double value, double[] points) {
+        return bezierEase(value, points[0], points[1], points[2], points[3]);
+    }
+    
+    public static float bezierEase(float value, double[] points) {
+        return (float) bezierEase(value, points[0], points[1], points[2], points[3]);
+    }
+    
+    private static double bezierEase(double value, double point1, double point2, double point3, double point4) {
+        return point1 * Math.pow(1 - value, 3) + 3 * point2 * Math.pow(1 - value, 2) * value + 3 * point2 * (1 - value) * Math.pow(value, 2) + point4 * Math.pow(value, 3);
     }
     
     public static SlightGuiModificationsConfig getConfig() {return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig();}

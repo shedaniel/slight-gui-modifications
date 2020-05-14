@@ -7,3 +7,5 @@ accessible field net/minecraft/client/gui/screen/world/SelectWorldScreen levelLi
 accessible field net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen selectedEntry Lnet/minecraft/client/network/ServerInfo;
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen editEntry (Z)V
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen removeEntry (Z)V
+accessible field net/minecraft/client/texture/NativeImage isStbImage Z
+accessible method net/minecraft/client/gui/DrawableHelper innerBlit (IIIIIFFFF)V

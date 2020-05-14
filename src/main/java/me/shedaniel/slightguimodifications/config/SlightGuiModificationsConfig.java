@@ -25,6 +25,7 @@ public class SlightGuiModificationsConfig implements ConfigData {
     @ConfigEntry.Gui.CollapsibleObject public CustomScaling customScaling = new CustomScaling();
     @ConfigEntry.Gui.CollapsibleObject public SlotHighlight slotHighlight = new SlotHighlight();
     @Comment("Whether GUI should allow right click actions.") @ConfigEntry.Gui.Tooltip() public boolean rightClickActions = false;
+    public boolean satisfyingScreenshots = false;
     
     public static class OpeningAnimation {
         public boolean fluidChatOpening = false;

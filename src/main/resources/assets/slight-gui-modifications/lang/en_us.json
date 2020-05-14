@@ -42,6 +42,7 @@
   "text.autoconfig.slightguimodifications/config.option.slotHighlight.color": "Highlight Color:",
   "text.autoconfig.slightguimodifications/config.option.debugInformation": "Debug Information",
   "text.autoconfig.slightguimodifications/config.option.debugInformation.showFps": "Show FPS:",
+  "text.autoconfig.slightguimodifications/config.option.satisfyingScreenshots": "Satisfying Screenshots:",
   "text.slightguimodifications": "'Slight' Gui Modifications",
   "text.slightguimodifications.debugFps": "FPS: %d",
   "text.slightguimodifications.paste": "Paste",
