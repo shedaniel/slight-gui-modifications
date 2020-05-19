@@ -5,7 +5,6 @@ import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig
 import me.shedaniel.slightguimodifications.gui.cts.CtsRegistry
 import me.shedaniel.slightguimodifications.gui.cts.Position
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text
-import net.fabricmc.loader.api.FabricLoader
 
 @SuppressWarnings(["unused", "GrMethodMayBeStatic"])
 class ScriptDSL {
@@ -56,11 +55,7 @@ class ScriptDSL {
     }
 
     static Closure modMenu() {
-        return {
-            if (FabricLoader.getInstance().isModLoaded("modmenu")) {
-                SlightGuiModifications.openModMenu()
-            }
-        }
+        return { SlightGuiModifications.openModMenu() }
     }
 
     static Closure language() {

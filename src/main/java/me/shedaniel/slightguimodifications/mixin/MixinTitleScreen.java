@@ -12,13 +12,16 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +29,10 @@ import java.util.List;
 
 @Mixin(TitleScreen.class)
 public class MixinTitleScreen extends Screen {
+    @Shadow @Final public boolean doBackgroundFade;
+    
+    @Shadow private long backgroundFadeStart;
+    
     protected MixinTitleScreen(Text title) {
         super(title);
     }
@@ -84,13 +91,14 @@ public class MixinTitleScreen extends Screen {
             RenderSystem.color4f(1, 1, 1, 0);
     }
     
-    @Inject(method = "render", locals = LocalCapture.CAPTURE_FAILHARD,
+    @Inject(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureManager;bindTexture(Lnet/minecraft/util/Identifier;)V", ordinal = 2))
-    private void preEditionRender(int mouseX, int mouseY, float delta, CallbackInfo ci, float f, int i, int j, float g, int l) {
+    private void preEditionRender(int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (SlightGuiModifications.getCtsConfig().enabled)
             if (SlightGuiModifications.getCtsConfig().removeMinecraftLogoTexture)
                 RenderSystem.color4f(1, 1, 1, 0);
-            else RenderSystem.color4f(1, 1, 1, g);
+            else
+                RenderSystem.color4f(1, 1, 1, this.doBackgroundFade ? (float) MathHelper.ceil(MathHelper.clamp((float) (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0F, 0.0F, 1.0F)) : 1.0F);
     }
     
     @Inject(method = "areRealmsNotificationsEnabled", at = @At("HEAD"), cancellable = true)

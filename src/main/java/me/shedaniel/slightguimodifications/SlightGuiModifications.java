@@ -5,8 +5,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.swordglowsblue.artifice.api.Artifice;
 import com.swordglowsblue.artifice.api.resource.ArtificeResource;
-import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.gui.ModsScreen;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
@@ -14,7 +12,6 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.hooks.ClothClientHooks;
 import me.shedaniel.cloth.hooks.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.math.api.Executor;
 import me.shedaniel.math.api.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
@@ -345,14 +342,22 @@ public class SlightGuiModifications implements ClientModInitializer {
     }
     
     public static void openModMenu() {
-        Executor.run(() -> () -> {
-            MinecraftClient.getInstance().openScreen(new ModsScreen(MinecraftClient.getInstance().currentScreen));
-        });
+        if (FabricLoader.getInstance().isModLoaded("modmenu")) {
+            try {
+                Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("openModMenu").invoke(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     
-    @SuppressWarnings("Convert2MethodRef")
     public static String getModMenuModsCount() {
-        return Executor.call(() -> () -> ModMenu.getDisplayedModCount());
+        try {
+            return (String) Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("openModMenu").invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
     }
     
     public static double bezierEase(double value, double[] points) {
