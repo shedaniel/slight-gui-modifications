@@ -68,7 +68,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
             return;
         if ((Object) this instanceof TitleScreen && ((TitleScreenHooks) this).isDoBackgroundFade() && (((TitleScreenHooks) this).getBackgroundFadeStart() == 0 || Util.getMeasuringTimeMs() - ((TitleScreenHooks) this).getBackgroundFadeStart() <= 1000))
             return;
-        SlightGuiModificationsConfig config = SlightGuiModifications.getConfig();
+        SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
         if (lastScreen != null && (Object) this.getClass() == lastScreen.getClass())
             return;
         boolean affected = (Object) this instanceof ContainerScreen ? config.openingAnimation.affectsInventories : config.openingAnimation.affectsGameMenus;

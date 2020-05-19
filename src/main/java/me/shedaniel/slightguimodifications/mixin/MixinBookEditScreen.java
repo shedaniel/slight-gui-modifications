@@ -67,7 +67,7 @@ public abstract class MixinBookEditScreen extends Screen {
             return;
         }
         if (signing) return;
-        if (SlightGuiModifications.getConfig().rightClickActions && button == 1) {
+        if (SlightGuiModifications.getGuiConfig().rightClickActions && button == 1) {
             String pageContent = this.getCurrentPageContent();
             BookEditScreen.Position mousePos = ((BookEditScreen) (Object) this).new Position((int) mouseX, (int) mouseY);
             this.translateGlPositionToRelativePosition(mousePos);

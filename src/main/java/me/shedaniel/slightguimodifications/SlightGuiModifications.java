@@ -3,15 +3,23 @@ package me.shedaniel.slightguimodifications;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.swordglowsblue.artifice.api.Artifice;
+import com.swordglowsblue.artifice.api.resource.ArtificeResource;
+import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.gui.ModsScreen;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.hooks.ClothClientHooks;
+import me.shedaniel.cloth.hooks.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.math.api.Executor;
 import me.shedaniel.math.api.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
+import me.shedaniel.slightguimodifications.gui.cts.CtsRegistry;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.fabricmc.api.ClientModInitializer;
@@ -24,6 +32,7 @@ import net.minecraft.client.gui.screen.VideoOptionsScreen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.options.SoundOptionsScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -32,6 +41,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.math.MathHelper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Collections;
 
@@ -48,6 +61,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static Identifier prettyScreenshotTextureId = null;
     public static Identifier lastPrettyScreenshotTextureId = null;
     public static long prettyScreenshotTime = -1;
+    public static long backgroundTime = -1;
     
     private static final Lazy<Object> COLOR_OBJ = new Lazy<>(() -> {
         try {
@@ -220,7 +234,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     @Override
     public void onInitializeClient() {
-        AutoConfig.register(SlightGuiModificationsConfig.class, JanksonConfigSerializer::new);
+        AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
         AutoConfig.getGuiRegistry(SlightGuiModificationsConfig.class).registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                         ConfigEntryBuilder.create().startIntSlider(i13n, (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
@@ -234,7 +248,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                                 .setSaveConsumer(integer -> setUnsafely(field, config, integer / 100.0))
                                 .build()
                 ),
-                SlightGuiModificationsConfig.ScaleSlider.class
+                SlightGuiModificationsConfig.Gui.ScaleSlider.class
         );
         ClothClientHooks.SCREEN_MOUSE_CLICKED.register((client, screen, mouseX, mouseY, mouseButton) -> {
             if (((MenuWidgetListener) screen).getMenu() != null) {
@@ -243,7 +257,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 }
                 return ActionResult.SUCCESS;
             }
-            if (SlightGuiModifications.getConfig().rightClickActions && mouseButton == 1) {
+            if (SlightGuiModifications.getGuiConfig().rightClickActions && mouseButton == 1) {
                 // Pause Menu
                 if (screen instanceof GameMenuScreen || screen instanceof TitleScreen) {
                     AbstractButtonWidget optionsButton = screen.buttons.stream().filter(button -> button.getMessage().equals(I18n.translate("menu.options"))).findFirst().get();
@@ -269,6 +283,76 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             return ActionResult.PASS;
         });
+        reloadCtsAsync();
+        Artifice.registerAssets(new Identifier("slightguimodifications:cts_textures"), builder -> {
+            File buttons = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/buttons.png");
+            if (buttons.exists()) {
+                builder.add(new Identifier("minecraft:textures/gui/widgets.png"), new ArtificeResource<FileInputStream>() {
+                    @Override
+                    public FileInputStream getData() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public String toOutputString() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public InputStream toInputStream() {
+                        try {
+                            return new FileInputStream(buttons);
+                        } catch (FileNotFoundException e) {
+                            return null;
+                        }
+                    }
+                });
+            }
+            File textField = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/text_field.png");
+            if (textField.exists()) {
+                builder.add(new Identifier("minecraft:textures/gui/text_field.png"), new ArtificeResource<FileInputStream>() {
+                    @Override
+                    public FileInputStream getData() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public String toOutputString() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public InputStream toInputStream() {
+                        try {
+                            return new FileInputStream(textField);
+                        } catch (FileNotFoundException e) {
+                            return null;
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    public static void reloadCtsAsync() {
+        cts = new SlightGuiModificationsConfig.Cts();
+        CtsRegistry.loadScriptsAsync();
+    }
+    
+    public static void reloadCts() {
+        cts = new SlightGuiModificationsConfig.Cts();
+        CtsRegistry.loadScripts();
+    }
+    
+    public static void openModMenu() {
+        Executor.run(() -> () -> {
+            MinecraftClient.getInstance().openScreen(new ModsScreen(MinecraftClient.getInstance().currentScreen));
+        });
+    }
+    
+    @SuppressWarnings("Convert2MethodRef")
+    public static String getModMenuModsCount() {
+        return Executor.call(() -> () -> ModMenu.getDisplayedModCount());
     }
     
     public static double bezierEase(double value, double[] points) {
@@ -283,10 +367,18 @@ public class SlightGuiModifications implements ClientModInitializer {
         return point1 * Math.pow(1 - value, 3) + 3 * point2 * Math.pow(1 - value, 2) * value + 3 * point2 * (1 - value) * Math.pow(value, 2) + point4 * Math.pow(value, 3);
     }
     
-    public static SlightGuiModificationsConfig getConfig() {return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig();}
+    public static SlightGuiModificationsConfig.Gui getGuiConfig() {
+        return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig().gui;
+    }
+    
+    private static SlightGuiModificationsConfig.Cts cts = new SlightGuiModificationsConfig.Cts();
+    
+    public static SlightGuiModificationsConfig.Cts getCtsConfig() {
+        return cts;
+    }
     
     public static float getSpeed() {
-        return getConfig().openingAnimation.fluidAnimationDuration;
+        return getGuiConfig().openingAnimation.fluidAnimationDuration;
     }
     
     @SuppressWarnings("deprecation")
@@ -297,6 +389,11 @@ public class SlightGuiModifications implements ClientModInitializer {
             builder.setSavingRunnable(() -> {
                 runnable.run();
                 MinecraftClient.getInstance().onResolutionChanged();
+            });
+            builder.setAfterInitConsumer(screen -> {
+                ((ScreenHooks) screen).cloth_addButton(new ButtonWidget(screen.width - 104, 4, 100, 20, I18n.translate("text.slightguimodifications.reloadCts"), button -> {
+                    SlightGuiModifications.reloadCts();
+                }));
             });
             return builder.build();
         });

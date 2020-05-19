@@ -9,3 +9,6 @@ accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen 
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen removeEntry (Z)V
 accessible field net/minecraft/client/texture/NativeImage isStbImage Z
 accessible method net/minecraft/client/gui/DrawableHelper innerBlit (IIIIIFFFF)V
+accessible field net/minecraft/client/gui/screen/TitleScreen backgroundRenderer Lnet/minecraft/client/gui/RotatingCubeMapRenderer;
+accessible field net/minecraft/client/gui/screen/TitleScreen PANORAMA_OVERLAY Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/screen/TitleScreen doBackgroundFade Z

@@ -80,7 +80,7 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
     @Redirect(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;hasBorder()Z", ordinal = 0))
     private boolean hasBorder(TextFieldWidget textFieldWidget) {
         boolean border = hasBorder();
-        if (border && SlightGuiModifications.getConfig().textFieldModifications.enabled && SlightGuiModifications.getConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.TextFieldModifications.BackgroundMode.TEXTURE) {
+        if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
             renderTextureBorder();
             return false;
         }
@@ -115,19 +115,19 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
     @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(IIIII)V", ordinal = 0),
                index = 4)
     private int modifyBorderColor(int color) {
-        return SlightGuiModifications.getConfig().textFieldModifications.enabled ? SlightGuiModifications.getConfig().textFieldModifications.borderColor | 255 << 24 : color;
+        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
     @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(IIIII)V", ordinal = 1),
                index = 4)
     private int modifyBackgroundColor(int color) {
-        return SlightGuiModifications.getConfig().textFieldModifications.enabled ? SlightGuiModifications.getConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
+        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     
     @Inject(method = "drawSelectionHighlight", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;color4f(FFFF)V", ordinal = 0),
             cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void drawSelectionHighlight(int x1, int y1, int x2, int y2, CallbackInfo ci, Tessellator tessellator, BufferBuilder buffer) {
-        if (!SlightGuiModifications.getConfig().textFieldModifications.enabled || SlightGuiModifications.getConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.TextFieldModifications.SelectionMode.HIGHLIGHT)
+        if (!SlightGuiModifications.getGuiConfig().textFieldModifications.enabled || SlightGuiModifications.getGuiConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.Gui.TextFieldModifications.SelectionMode.HIGHLIGHT)
             return;
         ci.cancel();
         int tmp;
@@ -174,7 +174,7 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (isMouseOver(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getConfig().textFieldModifications.rightClickActions && button == 1) {
+        if (isMouseOver(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1) {
             if (isEditable()) {
                 if (selectionStart - selectionEnd != 0) {
                     ((MenuWidgetListener) MinecraftClient.getInstance().currentScreen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createSelectingMenu()));

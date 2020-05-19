@@ -41,7 +41,7 @@ public abstract class MixinMinecraftClient {
     
     @Inject(method = "getFramerateLimit", at = @At("RETURN"), cancellable = true)
     private void getFramerateLimit(CallbackInfoReturnable<Integer> cir) {
-        if (cir.getReturnValueI() == 60 && SlightGuiModifications.getConfig().unlimitTitleScreenFps) {
+        if (cir.getReturnValueI() == 60 && SlightGuiModifications.getGuiConfig().unlimitTitleScreenFps) {
             cir.setReturnValue(window.getFramerateLimit());
         }
     }
@@ -49,8 +49,8 @@ public abstract class MixinMinecraftClient {
     @ModifyArg(method = "onResolutionChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setScaleFactor(D)V", ordinal = 0),
                index = 0)
     private double getGuiScale(double scale) {
-        if (SlightGuiModifications.getConfig().customScaling.scale <= 1) return scale;
-        double configGuiScale = SlightGuiModifications.getConfig().customScaling.scale;
+        if (SlightGuiModifications.getGuiConfig().customScaling.scale <= 1) return scale;
+        double configGuiScale = SlightGuiModifications.getGuiConfig().customScaling.scale;
         return Math.min(configGuiScale, scale + 2);
     }
 }

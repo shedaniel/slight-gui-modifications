@@ -35,7 +35,7 @@ public abstract class MixinWorldListWidget$Entry {
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (SlightGuiModifications.getConfig().rightClickActions && button == 1) {
+        if (SlightGuiModifications.getGuiConfig().rightClickActions && button == 1) {
             screen.levelList.setSelected((WorldListWidget.Entry) (Object) this);
             this.screen.worldSelected(screen.levelList.method_20159().isPresent());
             ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),

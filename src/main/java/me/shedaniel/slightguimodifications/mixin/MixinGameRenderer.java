@@ -113,7 +113,7 @@ public class MixinGameRenderer {
         if (!client.options.hudHidden) {
             if (!(client.overlay instanceof SplashScreen)) {
                 long ms = Util.getMeasuringTimeMs();
-                if (SlightGuiModifications.getConfig().debugInformation.showFps) {
+                if (SlightGuiModifications.getGuiConfig().debugInformation.showFps) {
                     endFps = -1;
                     if (startFps == -1) startFps = ms;
                     RenderSystem.pushMatrix();

@@ -20,7 +20,7 @@ public class MixinToastManager {
     @SuppressWarnings({"UnresolvedMixinReference", "InvalidMemberReference"})
     @Inject(method = {"getDissapearProgress", "method_2003"}, cancellable = true, at = @At("HEAD"), remap = false)
     private void getDissapearProgress(long time, CallbackInfoReturnable<Float> cir) {
-        if (!SlightGuiModifications.getConfig().fluidAdvancements)
+        if (!SlightGuiModifications.getGuiConfig().fluidAdvancements)
             return;
         float f = SlightGuiModifications.ease(MathHelper.clamp((float) (time - this.field_2243) / 600.0F, 0.0F, 1.0F));
         cir.setReturnValue(this.visibility == Toast.Visibility.HIDE ? 1.0F - f : f);

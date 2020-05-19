@@ -3,6 +3,8 @@ plugins {
     id 'maven-publish'
 }
 
+apply plugin: 'groovy'
+
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
@@ -13,9 +15,17 @@ minecraft {
     accessWidener = file("src/main/resources/slight-gui-modifications.aw")
 }
 
+sourceSets {
+    main {
+        groovy { srcDirs += ['src/main/groovy'] }
+    }
+}
+
 repositories {
     maven { url "https://jitpack.io" }
     maven { url "https://dl.bintray.com/shedaniel/shedaniel-mods" }
+    maven { url "https://server.bbkr.space/artifactory/libs-release" }
+    mavenCentral()
 }
 
 dependencies {
@@ -28,20 +38,30 @@ dependencies {
     modRuntime "me.shedaniel:SmoothScrollingEverywhere:2.4.1"
     modCompile "me.shedaniel:RoughlyEnoughItems:3.6.13"
     modCompile "io.github.prospector:modmenu:1.10.2+build.32"
-    modApi "me.shedaniel.cloth:config-2:2.13.5"
+    modApi "me.shedaniel.cloth:config-2:2.14.0"
     modApi "me.shedaniel.cloth:cloth-events:${project.cloth_events}"
-    modApi "me.sargunvohra.mcmods:autoconfig1u:2.0.1"
+    modApi "me.sargunvohra.mcmods:autoconfig1u:2.1.0"
+//    modApi "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+//    compile "org.jetbrains.kotlin:kotlin-script-util:1.3.71"
+//    compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:1.3.71"
+//    compile "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.3.71"
+    modApi "com.lettuce.fudge:artifice:${project.artifice_version}"
+    modApi "org.codehaus.groovy:groovy-jsr223:3.0.3"
+    modApi "io.github.cottonmc:Parchment:1.0.1+1.15.2"
 
     afterEvaluate {
         def listAdded = []
-        def eachDep = { dep ->
+        def eachDep = null
+        eachDep = { dep ->
             for (apiIncludeDepStr in (api_include as String).split(',')) {
                 def apiIncludeGroup = apiIncludeDepStr.split(':')[0]
                 def apiIncludeDep = apiIncludeDepStr.split(':')[1]
+//                println dep
                 if (dep.module.id.group == apiIncludeGroup && dep.module.id.name.startsWith(apiIncludeDep)) {
                     def version = dep.module.id.version.indexOf('@') >= 0 ? dep.module.id.version.substring(0, dep.module.id.version.indexOf('@')) : dep.module.id.version
                     def mavenDep = "${dep.module.id.group}:${dep.module.id.name}:$version"
                     if (!(mavenDep in listAdded)) {
+                        println mavenDep
                         include(mavenDep) {
                             transitive = false
                         }
@@ -50,7 +70,9 @@ dependencies {
                     break
                 }
             }
+            dep.children.each eachDep
         }
+        
         configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.each eachDep
         configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies.each eachDep
     }

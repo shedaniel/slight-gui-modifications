@@ -30,7 +30,7 @@ public abstract class MixinChatScreen extends Screen implements AnimationListene
     
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(String originalChatText, CallbackInfo ci) {
-        start = SlightGuiModifications.getConfig().openingAnimation.fluidChatOpening ? Util.getMeasuringTimeMs() : -1;
+        start = SlightGuiModifications.getGuiConfig().openingAnimation.fluidChatOpening ? Util.getMeasuringTimeMs() : -1;
     }
     
     @Inject(method = "render", at = @At(value = "HEAD"))

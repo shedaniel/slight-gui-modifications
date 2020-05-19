@@ -35,7 +35,7 @@ public abstract class MixinMultiplayerServerListWidget$ServerEntry {
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (SlightGuiModifications.getConfig().rightClickActions && button == 1) {
+        if (SlightGuiModifications.getGuiConfig().rightClickActions && button == 1) {
             this.screen.select((MultiplayerServerListWidget.ServerEntry) (Object) this);
             ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
                     ImmutableList.of(

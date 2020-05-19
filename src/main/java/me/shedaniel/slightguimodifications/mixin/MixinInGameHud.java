@@ -62,7 +62,7 @@ public class MixinInGameHud extends DrawableHelper {
      */
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     protected void renderStatusEffectOverlay(CallbackInfo ci) {
-        if (!SlightGuiModifications.getConfig().fluidStatusEffects) return;
+        if (!SlightGuiModifications.getGuiConfig().fluidStatusEffects) return;
         ci.cancel();
         Collection<StatusEffectInstance> collection = this.client.player.getStatusEffects();
         if (!collection.isEmpty()) {
