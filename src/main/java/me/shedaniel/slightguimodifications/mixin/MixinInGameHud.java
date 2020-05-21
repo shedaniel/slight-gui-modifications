@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.StatusEffectSpriteManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.math.MathHelper;
@@ -61,7 +62,7 @@ public class MixinInGameHud extends DrawableHelper {
      * @author shedaniel
      */
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
-    protected void renderStatusEffectOverlay(CallbackInfo ci) {
+    protected void renderStatusEffectOverlay(MatrixStack matrices, CallbackInfo ci) {
         if (!SlightGuiModifications.getGuiConfig().fluidStatusEffects) return;
         ci.cancel();
         Collection<StatusEffectInstance> collection = this.client.player.getStatusEffects();
@@ -92,31 +93,31 @@ public class MixinInGameHud extends DrawableHelper {
                         y[0] += 26;
                     }
                     
-                    RenderSystem.pushMatrix();
+                    matrices.push();
                     float alphaOffset = (float) Math.min(1.0, 1 - EasingMethod.EasingMethodImpl.LINEAR.apply(1 - MathHelper.clamp(statusEffectInstance.getDuration() / 10.0, 0, 1)));
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, alphaOffset);
-                    RenderSystem.translated(x[0] - this.scaledWidth, 0, 0);
+                    matrices.translate(x[0] - this.scaledWidth, 0, 0);
                     float[] alpha = {alphaOffset};
                     if (statusEffectInstance.isAmbient()) {
-                        this.blit(this.scaledWidth, y[0], 165, 166, 24, 24);
+                        this.drawTexture(matrices, this.scaledWidth, y[0], 165, 166, 24, 24);
                     } else {
-                        this.blit(this.scaledWidth, y[0], 141, 166, 24, 24);
+                        this.drawTexture(matrices, this.scaledWidth, y[0], 141, 166, 24, 24);
                         if (statusEffectInstance.getDuration() <= 200) {
                             int m = 10 - statusEffectInstance.getDuration() / 20;
                             alpha[0] = alphaOffset * MathHelper.clamp((float) statusEffectInstance.getDuration() / 10.0F / 5.0F * 0.5F, 0.0F, 0.5F) + MathHelper.cos((float) statusEffectInstance.getDuration() * 3.1415927F / 5.0F) * MathHelper.clamp((float) m / 10.0F * 0.25F, 0.0F, 0.25F);
                         }
                     }
-                    RenderSystem.popMatrix();
+                    matrices.pop();
                     
                     Sprite sprite = statusEffectSpriteManager.getSprite(statusEffect);
                     list.add(() -> {
                         if (alpha[0] <= 0.01) return;
                         this.client.getTextureManager().bindTexture(sprite.getAtlas().getId());
-                        RenderSystem.pushMatrix();
+                        matrices.push();
                         RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha[0]);
-                        RenderSystem.translated(x[0] - this.scaledWidth, 0, 0);
-                        blit(this.scaledWidth + 3, y[0] + 3, this.getBlitOffset(), 18, 18, sprite);
-                        RenderSystem.popMatrix();
+                        matrices.translate(x[0] - this.scaledWidth, 0, 0);
+                        drawSprite(matrices, this.scaledWidth + 3, y[0] + 3, this.getZOffset(), 18, 18, sprite);
+                        matrices.pop();
                     });
                 }
             }

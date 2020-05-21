@@ -12,7 +12,7 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.hooks.ClothClientHooks;
 import me.shedaniel.cloth.hooks.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
@@ -33,6 +33,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
@@ -178,6 +179,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     }
     
     public static int applyYAnimation(int y) {
+        if (!RenderSystem.isOnRenderThread()) return y;
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedYOffset();
@@ -198,6 +200,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static double reverseYAnimation(double y) {return y - applyYAnimation(y) + y;}
     
     public static double applyYAnimation(double y) {
+        if (!RenderSystem.isOnRenderThread()) return y;
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedYOffset();
@@ -234,13 +237,13 @@ public class SlightGuiModifications implements ClientModInitializer {
         AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
         AutoConfig.getGuiRegistry(SlightGuiModificationsConfig.class).registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
-                        ConfigEntryBuilder.create().startIntSlider(i13n, (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
+                        ConfigEntryBuilder.create().startIntSlider(new TranslatableText(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
                                 (MinecraftClient.getInstance().getWindow().calculateScaleFactor(0, false) + 4) * 100)
                                 .setDefaultValue(0)
                                 .setTextGetter(integer -> {
                                     if (integer <= 100)
-                                        return I18n.translate(i13n + ".text.disabled");
-                                    return I18n.translate(i13n + ".text", integer / 100.0);
+                                        return new TranslatableText(i13n + ".text.disabled");
+                                    return new TranslatableText(i13n + ".text", integer / 100.0);
                                 })
                                 .setSaveConsumer(integer -> setUnsafely(field, config, integer / 100.0))
                                 .build()
@@ -353,7 +356,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     public static String getModMenuModsCount() {
         try {
-            return (String) Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("openModMenu").invoke(null);
+            return (String) Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("getDisplayedModCount").invoke(null);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();
@@ -396,7 +399,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 MinecraftClient.getInstance().onResolutionChanged();
             });
             builder.setAfterInitConsumer(screen -> {
-                ((ScreenHooks) screen).cloth_addButton(new ButtonWidget(screen.width - 104, 4, 100, 20, I18n.translate("text.slightguimodifications.reloadCts"), button -> {
+                ((ScreenHooks) screen).cloth_addButton(new ButtonWidget(screen.width - 104, 4, 100, 20, new TranslatableText("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.reloadCts();
                 }));
             });

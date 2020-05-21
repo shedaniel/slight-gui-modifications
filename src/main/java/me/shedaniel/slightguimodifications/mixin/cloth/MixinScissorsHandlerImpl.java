@@ -1,7 +1,7 @@
 package me.shedaniel.slightguimodifications.mixin.cloth;
 
 import me.shedaniel.clothconfig2.impl.ScissorsHandlerImpl;
-import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

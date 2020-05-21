@@ -1,7 +1,7 @@
 package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.ImmutableList;
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.SplitterMenuEntry;
@@ -52,8 +52,8 @@ public abstract class MixinMultiplayerServerListWidget$ServerEntry {
                                 if (string != null) {
                                     Text text = new TranslatableText("selectServer.deleteQuestion");
                                     Text text2 = new TranslatableText("selectServer.deleteWarning", string);
-                                    String string2 = I18n.translate("selectServer.deleteButton");
-                                    String string3 = I18n.translate("gui.cancel");
+                                    Text string2 = new TranslatableText("selectServer.deleteButton");
+                                    Text string3 = new TranslatableText("gui.cancel");
                                     this.client.openScreen(new ConfirmScreen(screen::removeEntry, text, text2, string2, string3));
                                 }
                             }),

@@ -1,7 +1,7 @@
 package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.ImmutableList;
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.SplitterMenuEntry;

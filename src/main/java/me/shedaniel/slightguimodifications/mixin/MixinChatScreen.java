@@ -6,6 +6,7 @@ import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -34,12 +35,12 @@ public abstract class MixinChatScreen extends Screen implements AnimationListene
     }
     
     @Inject(method = "render", at = @At(value = "HEAD"))
-    private void preRender(int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void preRender(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.offset = start == -1 ? -1 : MathHelper.clamp((Util.getMeasuringTimeMs() - start) / 300, 0.0, 1.0);
     }
     
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;getText(DD)Lnet/minecraft/text/Text;"))
-    private void postRenderCommandSuggestor(int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void postRenderCommandSuggestor(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.offset = -1;
     }
     

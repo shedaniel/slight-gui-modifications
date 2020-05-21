@@ -99,7 +99,7 @@ public class Middleman {
             if (builder.getAlign().equals("center")) alignInt = 1;
             if (builder.getAlign().equals("right")) alignInt = 2;
             if (alignInt == -1) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new LabelWidget(position.getX(window.getScaledWidth()), position.getY(window.getScaledHeight()), alignInt, builder.getText().asFormattedString(), builder.getColor(), builder.getHoveredColor(), builder.getOnClicked());
+            return new LabelWidget(position.getX(window.getScaledWidth()), position.getY(window.getScaledHeight()), alignInt, builder.getText(), builder.getColor(), builder.getHoveredColor(), builder.getOnClicked());
         };
     }
     
@@ -126,7 +126,7 @@ public class Middleman {
             if (builder.getAlign().equals("center")) alignInt = -0.5;
             if (builder.getAlign().equals("right")) alignInt = -1;
             if (alignInt == -1.0) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new ButtonWidget((int) (position.getX(window.getScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().asFormattedString(), button -> builder.getOnClicked().run());
+            return new ButtonWidget((int) (position.getX(window.getScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run());
         };
     }
     

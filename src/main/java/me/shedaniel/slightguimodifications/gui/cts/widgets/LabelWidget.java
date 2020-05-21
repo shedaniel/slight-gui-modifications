@@ -2,9 +2,11 @@ package me.shedaniel.slightguimodifications.gui.cts.widgets;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,8 +14,8 @@ public class LabelWidget extends AbstractButtonWidget {
     private int alignment, color, hoveredColor;
     private Runnable onClicked;
     
-    public LabelWidget(int x, int y, int alignment, @NotNull String text, int color, int hoveredColor, @NotNull Runnable onClicked) {
-        super(x, y, 0, 0, text);
+    public LabelWidget(int x, int y, int alignment, @NotNull Text text, int color, int hoveredColor, @NotNull Runnable onClicked) {
+        super(x, y, 0, 0, text.unwrap());
         this.alignment = alignment;
         this.color = color;
         this.hoveredColor = hoveredColor;
@@ -21,7 +23,7 @@ public class LabelWidget extends AbstractButtonWidget {
     }
     
     @Override
-    public void renderButton(int mouseX, int mouseY, float delta) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         TextRenderer textRenderer = minecraftClient.textRenderer;
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
@@ -31,12 +33,11 @@ public class LabelWidget extends AbstractButtonWidget {
         int j = isMouseOver(mouseX, mouseY) ? hoveredColor : color;
         int x = this.x;
         if (alignment == 1) {
-            x -= textRenderer.getStringWidth(getMessage()) / 2;
+            x -= textRenderer.getWidth(getMessage()) / 2;
         } else if (alignment == 2) {
-            x -= textRenderer.getStringWidth(getMessage());
+            x -= textRenderer.getWidth(getMessage());
         }
-//        System.out.println(y +" "+minecraftClient.getWindow().getScaledHeight());
-        textRenderer.draw(this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        textRenderer.draw(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
     }
     
     @Override
@@ -44,7 +45,7 @@ public class LabelWidget extends AbstractButtonWidget {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         TextRenderer textRenderer = minecraftClient.textRenderer;
         if (mouseY < y || mouseY > y + textRenderer.fontHeight) return false;
-        int width = textRenderer.getStringWidth(getMessage());
+        int width = textRenderer.getWidth(getMessage());
         int x = this.x;
         if (alignment == 1) {
             x -= width / 2;

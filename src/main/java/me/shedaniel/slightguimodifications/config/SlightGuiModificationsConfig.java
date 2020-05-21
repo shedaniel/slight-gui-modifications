@@ -14,6 +14,7 @@ import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.Util;
@@ -162,12 +163,12 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
                 return 0;
             }
             
-            public abstract void render(TitleScreen screen, float delta, float alpha);
+            public abstract void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha);
         }
         
         public static class DefaultBackgroundInfo extends BackgroundInfo {
             @Override
-            public void render(TitleScreen screen, float delta, float alpha) {
+            public void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha) {
                 MinecraftClient.getInstance().getTextureManager().bindTexture(TitleScreen.PANORAMA_OVERLAY);
                 screen.backgroundRenderer.render(delta, MathHelper.clamp(alpha * getAlpha(), 0.0F, 1.0F));
             }
@@ -181,13 +182,12 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
             }
             
             @Override
-            public void render(TitleScreen screen, float delta, float alpha) {
+            public void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha) {
                 MinecraftClient.getInstance().getTextureManager().bindTexture(provider.get());
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-//                System.out.println(screen.doBackgroundFade ? (float) MathHelper.ceil(MathHelper.clamp(alpha * getAlpha(), 0.0F, 1.0F)) : getAlpha());
-                RenderSystem.color4f(1.0F, 1.0F, 1.0F,getAlpha());
-                DrawableHelper.blit(0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
+                RenderSystem.color4f(1.0F, 1.0F, 1.0F, getAlpha());
+                DrawableHelper.drawTexture(matrices, 0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
             }
         }
         

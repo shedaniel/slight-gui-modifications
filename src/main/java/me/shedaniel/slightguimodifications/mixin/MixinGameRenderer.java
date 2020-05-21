@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.SplashScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -34,7 +35,9 @@ public class MixinGameRenderer {
     @Unique private long startFps = -1;
     @Unique private long endFps = 0;
     
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V", ordinal = 0))
+    @Inject(method = "render",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V",
+                     ordinal = 0))
     private void preRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         Screen screen = client.currentScreen;
         if (screen instanceof AnimationListener)
@@ -42,7 +45,8 @@ public class MixinGameRenderer {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V", ordinal = 0, shift = At.Shift.AFTER))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V", ordinal = 0,
+                     shift = At.Shift.AFTER))
     private void postRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         Screen screen = client.currentScreen;
         if (screen instanceof AnimationListener)
@@ -51,17 +55,18 @@ public class MixinGameRenderer {
     
     @Inject(method = "render", at = @At("RETURN"))
     private void postRenderEverything(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        MatrixStack matrices = new MatrixStack();
         Identifier lastPrettyScreenshotTextureId = SlightGuiModifications.lastPrettyScreenshotTextureId;
         if (lastPrettyScreenshotTextureId != null) {
             if (!client.options.hudHidden && !SlightGuiModifications.prettyScreenshots) {
-                RenderSystem.pushMatrix();
-                RenderSystem.translated(10, 10, 500);
+                matrices.push();
+                matrices.translate(10, 10, 500);
                 NativeImageBackedTexture lastPrettyScreenshotTexture = SlightGuiModifications.lastPrettyScreenshotTexture;
                 client.getTextureManager().bindTexture(lastPrettyScreenshotTextureId);
                 int width = (int) (client.getWindow().getScaledWidth() * .2);
                 int height = (int) (client.getWindow().getScaledWidth() * .2 / lastPrettyScreenshotTexture.getImage().getWidth() * lastPrettyScreenshotTexture.getImage().getHeight());
-                DrawableHelper.innerBlit(0, width, 0, height, 0, 0, 1, 0, 1);
-                RenderSystem.popMatrix();
+                DrawableHelper.drawTexturedQuad(matrices.peek().getModel(), 0, width, 0, height, 0, 0, 1, 0, 1);
+                matrices.pop();
             }
         }
         Identifier prettyScreenshotTextureId = SlightGuiModifications.prettyScreenshotTextureId;
@@ -98,15 +103,17 @@ public class MixinGameRenderer {
                 SlightGuiModifications.prettyScreenshotTime = -1;
             } else if (!client.options.hudHidden && !SlightGuiModifications.prettyScreenshots) {
                 RenderSystem.pushMatrix();
-                RenderSystem.translated(x, y, 500);
+                matrices.push();
+                matrices.translate(x, y, 500);
                 RenderSystem.enableBlend();
                 RenderSystem.disableAlphaTest();
                 RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
                 RenderSystem.shadeModel(GL11.GL_SMOOTH);
                 RenderSystem.color4f(1, 1, 1, 1);
-                DrawableHelper.innerBlit(0, width, 0, height, 0, 0, 1, 0, 1);
+                DrawableHelper.drawTexturedQuad(matrices.peek().getModel(), 0, width, 0, height, 0, 0, 1, 0, 1);
                 float a = (1 - (float) MathHelper.clamp((currentMs - prettyScreenshotTime) / fadeTime, 0.0, 1.0));
-                DrawableHelper.fill(0, 0, width, height, 0xFFFFFF | (int) (a * 255.0F) << 24);
+                DrawableHelper.fill(matrices, 0, 0, width, height, 0xFFFFFF | (int) (a * 255.0F) << 24);
+                matrices.pop();
                 RenderSystem.popMatrix();
             }
         }
@@ -116,22 +123,22 @@ public class MixinGameRenderer {
                 if (SlightGuiModifications.getGuiConfig().debugInformation.showFps) {
                     endFps = -1;
                     if (startFps == -1) startFps = ms;
-                    RenderSystem.pushMatrix();
-                    RenderSystem.translated(0, -(client.textRenderer.fontHeight + 2) * (1 - EasingMethod.EasingMethodImpl.EXPO.apply(Math.min(1, (ms - startFps) / 500.0))), 0);
+                    matrices.push();
+                    matrices.translate(0, -(client.textRenderer.fontHeight + 2) * (1 - EasingMethod.EasingMethodImpl.EXPO.apply(Math.min(1, (ms - startFps) / 500.0))), 0);
                     String s = I18n.translate("text.slightguimodifications.debugFps", MinecraftClient.currentFps);
-                    DrawableHelper.fill(0, 0, client.textRenderer.getStringWidth(s) + 2, client.textRenderer.fontHeight + 2, -16777216);
-                    client.textRenderer.draw(s, 1, 2, -1);
-                    RenderSystem.popMatrix();
+                    DrawableHelper.fill(matrices, 0, 0, client.textRenderer.getStringWidth(s) + 2, client.textRenderer.fontHeight + 2, -16777216);
+                    client.textRenderer.draw(matrices, s, 1, 2, -1);
+                    matrices.pop();
                 } else {
                     startFps = -1;
                     if (endFps == -1) endFps = ms;
                     if (ms - endFps <= 600) {
-                        RenderSystem.pushMatrix();
-                        RenderSystem.translated(0, -(client.textRenderer.fontHeight + 2) * EasingMethod.EasingMethodImpl.QUART.apply(Math.min(1, (ms - endFps) / 500.0)), 0);
+                        matrices.push();
+                        matrices.translate(0, -(client.textRenderer.fontHeight + 2) * EasingMethod.EasingMethodImpl.QUART.apply(Math.min(1, (ms - endFps) / 500.0)), 0);
                         String s = I18n.translate("text.slightguimodifications.debugFps", MinecraftClient.currentFps);
-                        DrawableHelper.fill(0, 0, client.textRenderer.getStringWidth(s) + 2, client.textRenderer.fontHeight + 2, -16777216);
-                        client.textRenderer.draw(s, 1, 2, -1);
-                        RenderSystem.popMatrix();
+                        DrawableHelper.fill(matrices, 0, 0, client.textRenderer.getStringWidth(s) + 2, client.textRenderer.fontHeight + 2, -16777216);
+                        client.textRenderer.draw(matrices, s, 1, 2, -1);
+                        matrices.pop();
                     }
                 }
             } else {
@@ -141,11 +148,11 @@ public class MixinGameRenderer {
         }
         if (client.currentScreen != null) {
             if (((MenuWidgetListener) client.currentScreen).getMenu() != null) {
-                RenderSystem.pushMatrix();
-                RenderSystem.translatef(0, 0, 700f);
+                matrices.push();
+                matrices.translate(0, 0, 700f);
                 Point point = PointHelper.ofMouse();
-                ((MenuWidgetListener) client.currentScreen).getMenu().render(point.x, point.y, client.getTickDelta());
-                RenderSystem.popMatrix();
+                ((MenuWidgetListener) client.currentScreen).getMenu().render(matrices, point.x, point.y, client.getTickDelta());
+                matrices.pop();
             }
         }
     }
@@ -155,7 +162,9 @@ public class MixinGameRenderer {
         SlightGuiModifications.backgroundTint = Math.max(SlightGuiModifications.backgroundTint - client.getLastFrameDuration() * 4, 0);
     }
     
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(IIF)V", ordinal = 0),
+    @ModifyArg(method = "render",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/util/math/MatrixStack;IIF)V",
+                        ordinal = 0),
                index = 1)
     private int transformScreenRenderMouseY(int mouseY) {
         return SlightGuiModifications.applyMouseYAnimation(mouseY);

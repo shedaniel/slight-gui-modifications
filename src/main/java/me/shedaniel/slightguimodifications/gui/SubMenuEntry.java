@@ -2,11 +2,12 @@ package me.shedaniel.slightguimodifications.gui;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
-import me.shedaniel.math.api.Point;
-import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.Point;
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.gui.widget.TabWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,21 +57,21 @@ public class SubMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(int mouseX, int mouseY, float delta) {
-        if (selected) fill(x, y, x + width, y + 12, -12237499);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
         if (selected && !entries.isEmpty()) {
             MenuWidget menu = getMenuWidget();
             menu.menuStartPoint.x = getParent().getBounds().getMaxX() - 1;
             menu.menuStartPoint.y = y - 1;
             List<Rectangle> areas = Lists.newArrayList(ScissorsHandler.INSTANCE.getScissorsAreas());
             ScissorsHandler.INSTANCE.clearScissors();
-            menu.render(mouseX, mouseY, delta);
+            menu.render(matrices, mouseX, mouseY, delta);
             for (Rectangle area : areas) ScissorsHandler.INSTANCE.scissor(area);
         }
-        MinecraftClient.getInstance().textRenderer.draw(text, x + 2, y + 2, selected ? 16777215 : 8947848);
+        MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
         if (!entries.isEmpty()) {
             MinecraftClient.getInstance().getTextureManager().bindTexture(TabWidget.CHEST_GUI_TEXTURE);
-            blit(x + width - 15, y - 2, 0, 28, 18, 18);
+            drawTexture(matrices, x + width - 15, y - 2, 0, 28, 18, 18);
         }
     }
     

@@ -1,6 +1,7 @@
 package me.shedaniel.slightguimodifications.gui;
 
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,9 @@ public class SplitterMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(int mouseX, int mouseY, float delta) {fillGradient(x + 3, y + 2, x + width - 3, y + 3, -7829368, -7829368);}
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        fillGradient(matrices, x + 3, y + 2, x + width - 3, y + 3, -7829368, -7829368);
+    }
     
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {

@@ -6,7 +6,6 @@ import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -15,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
@@ -33,15 +33,10 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
     @Shadow
     public int height;
     @Shadow
-    @Final
-    protected List<AbstractButtonWidget> buttons;
+    @Final public List<AbstractButtonWidget> buttons;
     
-    @Shadow
-    public abstract void renderDirtBackground(int alpha);
-    
-    @Shadow protected MinecraftClient minecraft;
-    @Shadow protected TextRenderer font;
     @Shadow @Final protected List<Element> children;
+    @Shadow protected MinecraftClient client;
     @Unique
     private long fadeStart = -1;
     @Unique
@@ -154,24 +149,25 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
         this.currentFade = currentFade;
     }
     
-    @Redirect(method = "renderBackground(I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;fillGradient(IIIIII)V"))
-    private void fillGradient(Screen screen, int top, int left, int right, int bottom, int color1, int color2) {
+    @Redirect(method = "renderBackground(Lnet/minecraft/client/util/math/MatrixStack;I)V",
+              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V"))
+    private void fillGradient(Screen screen, MatrixStack matrices, int top, int left, int right, int bottom, int color1, int color2) {
         if (this.renderingState == 2) {
             float alpha = slightguimodifications_getEasedYOffset();
             this.renderingState = 0;
             if (alpha >= 0) {
-                SlightGuiModifications.backgroundTint = Math.min(SlightGuiModifications.backgroundTint + minecraft.getLastFrameDuration() * 8, SlightGuiModifications.getSpeed() / 20f);
+                SlightGuiModifications.backgroundTint = Math.min(SlightGuiModifications.backgroundTint + client.getLastFrameDuration() * 8, SlightGuiModifications.getSpeed() / 20f);
                 float f = Math.min(SlightGuiModifications.backgroundTint / SlightGuiModifications.getSpeed() * 20f, 1f);
-                fillGradient(top, SlightGuiModifications.reverseYAnimation(left), right, SlightGuiModifications.reverseYAnimation(bottom),
+                fillGradient(matrices, top, SlightGuiModifications.reverseYAnimation(left), right, SlightGuiModifications.reverseYAnimation(bottom),
                         color1 & 16777215 | MathHelper.ceil(f * (float) (color1 >> 24 & 255)) << 24,
                         color2 & 16777215 | MathHelper.ceil(f * (float) (color2 >> 24 & 255)) << 24);
-            } else fillGradient(top, left, right, bottom, color1, color2);
+            } else fillGradient(matrices, top, left, right, bottom, color1, color2);
             this.renderingState = 2;
-        } else fillGradient(top, left, right, bottom, color1, color2);
+        } else fillGradient(matrices, top, left, right, bottom, color1, color2);
     }
     
     
-    @Inject(method = "renderDirtBackground",
+    @Inject(method = "renderBackgroundTexture",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;begin(ILnet/minecraft/client/render/VertexFormat;)V", ordinal = 0))
     private void preRenderDirtBackground(int alpha, CallbackInfo ci) {
         if (this.renderingState == 2) {
@@ -179,7 +175,7 @@ public abstract class MixinScreen extends AbstractParentElement implements Drawa
         }
     }
     
-    @Inject(method = "renderDirtBackground",
+    @Inject(method = "renderBackgroundTexture",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", ordinal = 0))
     private void postRenderDirtBackground(int alpha, CallbackInfo ci) {
         this.renderingState = 2;

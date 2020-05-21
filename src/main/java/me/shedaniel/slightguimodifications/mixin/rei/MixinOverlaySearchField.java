@@ -2,8 +2,8 @@ package me.shedaniel.slightguimodifications.mixin.rei;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.shedaniel.math.api.Point;
-import me.shedaniel.math.api.Rectangle;
+import me.shedaniel.math.Point;
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.gui.OverlaySearchField;
 import me.shedaniel.rei.gui.widget.TextFieldWidget;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
@@ -15,6 +15,8 @@ import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,16 +33,16 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     
     @Inject(method = "renderBorder",
             at = @At(value = "HEAD", remap = false), remap = false, cancellable = true)
-    private void hasBorder(CallbackInfo ci) {
+    private void renderBorder(MatrixStack matrices, CallbackInfo ci) {
         boolean border = hasBorder();
         if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
-            renderTextureBorder();
+            renderTextureBorder(matrices);
             ci.cancel();
         }
     }
     
     @Unique
-    private void renderTextureBorder() {
+    private void renderTextureBorder(MatrixStack matrices) {
         MinecraftClient.getInstance().getTextureManager().bindTexture(SlightGuiModifications.TEXT_FIELD_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
@@ -50,22 +52,23 @@ public class MixinOverlaySearchField extends TextFieldWidget {
         // 9 Patch Texture
         
         // Four Corners
-        blit(x - 1, y - 1, getBlitOffset(), 0, 0, 8, 8, 256, 256);
-        blit(x + width - 7, y - 1, getBlitOffset(), 248, 0, 8, 8, 256, 256);
-        blit(x - 1, y + height - 7, getBlitOffset(), 0, 248, 8, 8, 256, 256);
-        blit(x + width - 7, y + height - 7, getBlitOffset(), 248, 248, 8, 8, 256, 256);
+        drawTexture(matrices, x - 1, y - 1, getZOffset(), 0, 0, 8, 8, 256, 256);
+        drawTexture(matrices, x + width - 7, y - 1, getZOffset(), 248, 0, 8, 8, 256, 256);
+        drawTexture(matrices, x - 1, y + height - 7, getZOffset(), 0, 248, 8, 8, 256, 256);
+        drawTexture(matrices, x + width - 7, y + height - 7, getZOffset(), 248, 248, 8, 8, 256, 256);
         
+        Matrix4f matrix = matrices.peek().getModel();
         // Sides
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y - 1, y + 7, getBlitOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y + height - 7, y + height + 1, getBlitOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        DrawableHelper.innerBlit(x - 1, x + 7, y + 7, y + height - 7, getBlitOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        DrawableHelper.innerBlit(x + width - 7, x + width + 1, y + 7, y + height - 7, getBlitOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y - 1, y + 7, getZOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, getZOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x - 1, x + 7, y + 7, y + height - 7, getZOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, getZOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y + 7, y + height - 7, getBlitOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y + 7, y + height - 7, getZOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
     }
     
-    @ModifyArg(method = "renderBorder", at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/OverlaySearchField;fill(IIIII)V", ordinal = 2), index = 4,
+    @ModifyArg(method = "renderBorder", at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/OverlaySearchField;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 2), index = 4,
                remap = false)
     private int modifyBackgroundColor(int color) {return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;}
     

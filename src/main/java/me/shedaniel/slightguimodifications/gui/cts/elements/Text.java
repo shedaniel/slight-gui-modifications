@@ -1,15 +1,16 @@
 package me.shedaniel.slightguimodifications.gui.cts.elements;
 
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 import java.util.stream.Stream;
 
 public final class Text {
-    private net.minecraft.text.Text text;
+    private MutableText text;
     
-    private Text(net.minecraft.text.Text text) {
+    private Text(MutableText text) {
         this.text = text;
     }
     
@@ -29,10 +30,6 @@ public final class Text {
         return this.text.getString();
     }
     
-    public String asFormattedString() {
-        return this.text.asFormattedString();
-    }
-    
     public String asTruncatedString(int length) {
         return this.text.asTruncatedString(length);
     }
@@ -41,8 +38,8 @@ public final class Text {
         return wrap(this.text.copy());
     }
     
-    public Text deepCopy() {
-        return wrap(this.text.deepCopy());
+    public Text shallowCopy() {
+        return wrap(this.text.shallowCopy());
     }
     
     public Text formatted(String... s) {
@@ -61,7 +58,11 @@ public final class Text {
         }).toArray()));
     }
     
-    private static Text wrap(net.minecraft.text.Text text) {
+    private static Text wrap(MutableText text) {
         return new Text(text);
+    }
+    
+    public net.minecraft.text.Text unwrap() {
+        return text;
     }
 }

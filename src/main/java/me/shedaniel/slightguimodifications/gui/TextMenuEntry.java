@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 
 import java.util.Collections;
@@ -46,9 +47,9 @@ public class TextMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(int mouseX, int mouseY, float delta) {
-        if (selected) fill(x, y, x + width, y + 12, -12237499);
-        MinecraftClient.getInstance().textRenderer.draw(text, x + 2, y + 2, selected ? 16777215 : 8947848);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
+        MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
     }
     
     @Override

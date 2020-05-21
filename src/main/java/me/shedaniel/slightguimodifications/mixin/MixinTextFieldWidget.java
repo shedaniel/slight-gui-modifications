@@ -2,7 +2,7 @@ package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.shedaniel.math.api.Point;
+import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuEntry;
@@ -19,6 +19,9 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,6 +42,10 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
     @Shadow private int editableColor;
     
     @Shadow private int uneditableColor;
+    
+    public MixinTextFieldWidget(int x, int y, int width, int height, Text message) {
+        super(x, y, width, height, message);
+    }
     
     @Shadow
     protected abstract boolean hasBorder();
@@ -73,8 +80,12 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
     @Shadow
     public abstract boolean isMouseOver(double mouseX, double mouseY);
     
-    public MixinTextFieldWidget(int x, int y, String text) {
-        super(x, y, text);
+    @Unique
+    private MatrixStack lastMatrices;
+    
+    @Inject(method = "renderButton", at = @At("HEAD"))
+    private void preRenderButton(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.lastMatrices = matrices;
     }
     
     @Redirect(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;hasBorder()Z", ordinal = 0))
@@ -97,28 +108,30 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
         // 9 Patch Texture
         
         // Four Corners
-        blit(x - 1, y - 1, getBlitOffset(), 0, 0, 8, 8, 256, 256);
-        blit(x + width - 7, y - 1, getBlitOffset(), 248, 0, 8, 8, 256, 256);
-        blit(x - 1, y + height - 7, getBlitOffset(), 0, 248, 8, 8, 256, 256);
-        blit(x + width - 7, y + height - 7, getBlitOffset(), 248, 248, 8, 8, 256, 256);
+        drawTexture(lastMatrices, x - 1, y - 1, getZOffset(), 0, 0, 8, 8, 256, 256);
+        drawTexture(lastMatrices, x + width - 7, y - 1, getZOffset(), 248, 0, 8, 8, 256, 256);
+        drawTexture(lastMatrices, x - 1, y + height - 7, getZOffset(), 0, 248, 8, 8, 256, 256);
+        drawTexture(lastMatrices, x + width - 7, y + height - 7, getZOffset(), 248, 248, 8, 8, 256, 256);
         
+        Matrix4f matrix = lastMatrices.peek().getModel();
         // Sides
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y - 1, y + 7, getBlitOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y + height - 7, y + height + 1, getBlitOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        DrawableHelper.innerBlit(x - 1, x + 7, y + 7, y + height - 7, getBlitOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        DrawableHelper.innerBlit(x + width - 7, x + width + 1, y + 7, y + height - 7, getBlitOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y - 1, y + 7, getZOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, getZOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x - 1, x + 7, y + 7, y + height - 7, getZOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, getZOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        DrawableHelper.innerBlit(x + 7, x + width - 7, y + 7, y + height - 7, getBlitOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y + 7, y + height - 7, getZOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        this.lastMatrices = null;
     }
     
-    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(IIIII)V", ordinal = 0),
+    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 0),
                index = 4)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
-    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(IIIII)V", ordinal = 1),
+    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 1),
                index = 4)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
@@ -161,10 +174,10 @@ public abstract class MixinTextFieldWidget extends AbstractButtonWidget implemen
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
         RenderSystem.shadeModel(7425);
         buffer.begin(7, VertexFormats.POSITION_COLOR);
-        buffer.vertex(x1, y2, getBlitOffset() + 50d).color(r, g, b, 120).next();
-        buffer.vertex(x2, y2, getBlitOffset() + 50d).color(r, g, b, 120).next();
-        buffer.vertex(x2, y1, getBlitOffset() + 50d).color(r, g, b, 120).next();
-        buffer.vertex(x1, y1, getBlitOffset() + 50d).color(r, g, b, 120).next();
+        buffer.vertex(x1, y2, getZOffset() + 50d).color(r, g, b, 120).next();
+        buffer.vertex(x2, y2, getZOffset() + 50d).color(r, g, b, 120).next();
+        buffer.vertex(x2, y1, getZOffset() + 50d).color(r, g, b, 120).next();
+        buffer.vertex(x1, y1, getZOffset() + 50d).color(r, g, b, 120).next();
         tessellator.draw();
         RenderSystem.shadeModel(7424);
         RenderSystem.disableBlend();
