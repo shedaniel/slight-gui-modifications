@@ -42,18 +42,18 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     
     @Shadow(remap = false) protected boolean editable;
     
-    @Shadow(remap = false) protected int cursorMin;
+    @Shadow(remap = false) protected int selectionStart;
     
-    @Shadow(remap = false) protected int cursorMax;
+    @Shadow(remap = false) protected int selectionEnd;
     
     @Shadow(remap = false)
     public abstract boolean isFocused();
     
     @Shadow(remap = false)
-    public abstract void moveCursorToEnd();
+    public abstract void setCursorToEnd();
     
     @Shadow(remap = false)
-    public abstract void method_1884(int int_1);
+    public abstract void setSelectionEnd(int int_1);
     
     @Shadow(remap = false)
     public abstract void addText(String string_1);
@@ -64,7 +64,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @Shadow(remap = false)
     public abstract void setFocused(boolean boolean_1);
     
-    @Shadow(remap = false) private boolean field_2096;
+    @Shadow(remap = false) private boolean focusUnlocked;
     
     @Shadow(remap = false)
     public abstract void setText(String string_1);
@@ -106,19 +106,25 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
         DrawableHelper.drawTexturedQuad(matrix, x + 7, x + width - 7, y + 7, y + height - 7, getZOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
     }
     
-    @ModifyArg(method = "renderBorder", at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 0),
+    @ModifyArg(method = "renderBorder",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
+                        ordinal = 0),
                index = 4, remap = false)
     private int modifyBorderHighlightedColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
-    @ModifyArg(method = "renderBorder", at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 1),
+    @ModifyArg(method = "renderBorder",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
+                        ordinal = 1),
                index = 4, remap = false)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
-    @ModifyArg(method = "renderBorder", at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 2),
+    @ModifyArg(method = "renderBorder",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
+                        ordinal = 2),
                index = 4, remap = false)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
@@ -128,13 +134,13 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (getBounds().contains(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1 && !((Object) this instanceof OverlaySearchField)) {
             if (editable) {
-                if (cursorMin - cursorMax != 0) {
+                if (selectionStart - selectionEnd != 0) {
                     ((MenuWidgetListener) MinecraftClient.getInstance().currentScreen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createSelectingMenu()));
                 } else {
                     ((MenuWidgetListener) MinecraftClient.getInstance().currentScreen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createNonSelectingMenu()));
                 }
             } else {
-                if (cursorMin - cursorMax != 0) {
+                if (selectionStart - selectionEnd != 0) {
                     ((MenuWidgetListener) MinecraftClient.getInstance().currentScreen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createSelectingNotEditableMenu()));
                 } else {
                     ((MenuWidgetListener) MinecraftClient.getInstance().currentScreen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createNonSelectingNotEditableMenu()));
@@ -142,7 +148,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
             }
             cir.setReturnValue(true);
             boolean boolean_1 = mouseX >= (double) this.bounds.x && mouseX < (double) (this.bounds.x + this.bounds.width) && mouseY >= (double) this.bounds.y && mouseY < (double) (this.bounds.y + this.bounds.height);
-            if (this.field_2096) {
+            if (this.focusUnlocked) {
                 this.setFocused(boolean_1);
             }
         }
@@ -157,8 +163,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     private List<MenuEntry> createNonSelectingNotEditableMenu() {
         return ImmutableList.of(
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
-                    this.method_1884(0);
+                    this.setCursorToEnd();
+                    this.setSelectionEnd(0);
                     removeSelfMenu();
                 })
         );
@@ -174,8 +180,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
-                    this.method_1884(0);
+                    this.setCursorToEnd();
+                    this.setSelectionEnd(0);
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.clearAll"), () -> {
@@ -193,8 +199,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
-                    this.method_1884(0);
+                    this.setCursorToEnd();
+                    this.setSelectionEnd(0);
                     removeSelfMenu();
                 })
         
@@ -222,8 +228,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
-                    this.method_1884(0);
+                    this.setCursorToEnd();
+                    this.setSelectionEnd(0);
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.translate("text.slightguimodifications.clearAll"), () -> {

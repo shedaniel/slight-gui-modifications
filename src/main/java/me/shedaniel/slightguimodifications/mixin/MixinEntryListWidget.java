@@ -12,21 +12,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntryListWidget.class)
 public class MixinEntryListWidget {
-    @Inject(method = "renderHoleBackground",
-            at = @At(value = "HEAD"))
-    private void preRenderHoleBackground(int top, int bottom, int alphaTop, int alphaBottom, CallbackInfo ci) {
-        RenderSystem.pushMatrix();
-        RenderSystem.enableBlend();
-        RenderSystem.disableAlphaTest();
-        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-        RenderSystem.shadeModel(GL11.GL_SMOOTH);
-    }
-    
-    @Inject(method = "renderHoleBackground",
-            at = @At(value = "RETURN"))
-    private void postRenderHoleBackground(int top, int bottom, int alphaTop, int alphaBottom, CallbackInfo ci) {
-        RenderSystem.popMatrix();
-    }
+    // TODO Readd this
+//    @Inject(method = "renderHoleBackground",
+//            at = @At(value = "HEAD"))
+//    private void preRenderHoleBackground(int top, int bottom, int alphaTop, int alphaBottom, CallbackInfo ci) {
+//        RenderSystem.pushMatrix();
+//        RenderSystem.enableBlend();
+//        RenderSystem.disableAlphaTest();
+//        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//    }
+//    
+//    @Inject(method = "renderHoleBackground",
+//            at = @At(value = "RETURN"))
+//    private void postRenderHoleBackground(int top, int bottom, int alphaTop, int alphaBottom, CallbackInfo ci) {
+//        RenderSystem.popMatrix();
+//    }
     
     @Inject(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;begin(ILnet/minecraft/client/render/VertexFormat;)V"))

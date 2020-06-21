@@ -11,8 +11,23 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(TextRenderer.class)
 public abstract class MixinTextRenderer {
-    @ModifyVariable(method = "drawLayer", ordinal = 0, at = @At("HEAD"))
-    private int drawLayerChangeColor(int color) {
+    @ModifyVariable(method = "drawLayer(Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F",
+                    ordinal = 0, at = @At("HEAD"))
+    private int drawLayerStringChangeColor(int color) {
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        if (screen instanceof AnimationListener) {
+            float alpha = ((AnimationListener) screen).slightguimodifications_getAlpha();
+            if (alpha >= 0) {
+                return color & 16777215 | MathHelper.ceil(alpha * (float) (color >> 24 & 255)) << 24;
+            }
+        }
+        return color;
+    }
+    
+    @ModifyVariable(
+            method = "drawLayer(Lnet/minecraft/text/StringRenderable;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F",
+            ordinal = 0, at = @At("HEAD"))
+    private int drawLayerStringRenderableChangeColor(int color) {
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getAlpha();

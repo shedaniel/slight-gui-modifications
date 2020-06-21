@@ -9,8 +9,8 @@ import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
-import me.shedaniel.cloth.hooks.ClothClientHooks;
-import me.shedaniel.cloth.hooks.ScreenHooks;
+import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
+import me.shedaniel.cloth.api.client.events.v0.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
@@ -399,7 +399,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 MinecraftClient.getInstance().onResolutionChanged();
             });
             builder.setAfterInitConsumer(screen -> {
-                ((ScreenHooks) screen).cloth_addButton(new ButtonWidget(screen.width - 104, 4, 100, 20, new TranslatableText("text.slightguimodifications.reloadCts"), button -> {
+                ((ScreenHooks) screen).cloth$addButtonWidget(new ButtonWidget(screen.width - 104, 4, 100, 20, new TranslatableText("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.reloadCts();
                 }));
             });

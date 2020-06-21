@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.4.13'
+    id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -24,7 +24,6 @@ sourceSets {
 repositories {
     maven { url "https://jitpack.io" }
     maven { url "https://dl.bintray.com/shedaniel/shedaniel-mods" }
-    maven { url "https://server.bbkr.space/artifactory/libs-release" }
     maven { url "https://dl.bintray.com/shedaniel/legacy-yarn-updated" }
     mavenCentral()
 }
@@ -39,10 +38,10 @@ dependencies {
     }
     depend("com.github.Chocohead:Fabric-ASM:${project.fabric_asm_version}")
 //    optionally("me.shedaniel:SmoothScrollingEverywhere:3.0.1-unstable")
-    optionally("me.shedaniel:RoughlyEnoughItems:4.3.11-unstable")
-    optionally("io.github.prospector:modmenu:1.11.5+build.10")
+    optionally("me.shedaniel:RoughlyEnoughItems:4.5.1")
+    optionally("io.github.prospector:modmenu:1.12.1+build.15")
     depend("me.shedaniel.cloth:config-2:${project.cloth_config}")
-    depend("me.shedaniel.cloth:cloth-events:${project.cloth_events}")
+    depend("me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_api}")
     depend("me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u}")
 //    modApi "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 //    compile "org.jetbrains.kotlin:kotlin-script-util:1.3.71"
@@ -50,7 +49,6 @@ dependencies {
 //    compile "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.3.71"
     modApi("com.lettuce.fudge:artifice:${project.artifice_version}")
     modApi("org.codehaus.groovy:groovy-jsr223:3.0.3")
-    depend("io.github.cottonmc:Parchment:1.0.1+1.15.2")
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     afterEvaluate {

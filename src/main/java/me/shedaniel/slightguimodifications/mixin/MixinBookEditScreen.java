@@ -31,10 +31,10 @@ public abstract class MixinBookEditScreen extends Screen {
     @Shadow private boolean signing;
     
     @Shadow
-    protected abstract BookEditScreen.class_5234 method_27582(BookEditScreen.class_5234 arg);
+    protected abstract BookEditScreen.Position method_27582(BookEditScreen.Position arg);
     
     @Shadow
-    protected abstract BookEditScreen.class_5233 method_27576();
+    protected abstract BookEditScreen.PageContent getPageContent();
     
     @Shadow @Final private SelectionManager field_24269;
     
@@ -46,8 +46,8 @@ public abstract class MixinBookEditScreen extends Screen {
         }
         if (signing) return;
         if (SlightGuiModifications.getGuiConfig().rightClickActions && button == 1) {
-            BookEditScreen.class_5233 lv = this.method_27576();
-            BookEditScreen.class_5234 mousePos = new BookEditScreen.class_5234((int) mouseX, (int) mouseY);
+            BookEditScreen.PageContent lv = this.getPageContent();
+            BookEditScreen.Position mousePos = new BookEditScreen.Position((int) mouseX, (int) mouseY);
             mousePos = this.method_27582(mousePos);
             int index = lv.method_27602(textRenderer, mousePos);
             if (field_24269.method_27568() && index >= Math.min(field_24269.getSelectionStart(), field_24269.getSelectionEnd()) && index <= Math.max(field_24269.getSelectionStart(), field_24269.getSelectionEnd())) {
