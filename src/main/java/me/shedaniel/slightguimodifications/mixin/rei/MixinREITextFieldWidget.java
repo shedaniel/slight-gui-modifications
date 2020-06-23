@@ -70,7 +70,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     public abstract void setText(String string_1);
     
     @Inject(method = "renderBorder",
-            at = @At(value = "HEAD", remap = false), remap = false, cancellable = true)
+            at = @At(value = "HEAD"), remap = false, cancellable = true)
     private void renderBorder(MatrixStack matrices, CallbackInfo ci) {
         boolean border = hasBorder();
         if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
@@ -109,7 +109,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
                         ordinal = 0),
-               index = 4, remap = false)
+               index = 4)
     private int modifyBorderHighlightedColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
@@ -117,7 +117,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
                         ordinal = 1),
-               index = 4, remap = false)
+               index = 4)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
@@ -125,12 +125,12 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V",
                         ordinal = 2),
-               index = 4, remap = false)
+               index = 4)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (getBounds().contains(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1 && !((Object) this instanceof OverlaySearchField)) {
             if (editable) {
