@@ -99,7 +99,7 @@ public class Middleman {
             if (builder.getAlign().equals("center")) alignInt = 1;
             if (builder.getAlign().equals("right")) alignInt = 2;
             if (alignInt == -1) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new LabelWidget(position.getX(window.getScaledWidth()), position.getY(window.getScaledHeight()), alignInt, builder.getText(), builder.getColor(), builder.getHoveredColor(), builder.getOnClicked());
+            return new LabelWidget(position.getX(window.getScaledWidth()), position.getY(window.getScaledHeight()), alignInt, builder.getText(), builder.getColor(), builder.getHoveredColor(), builder.isShadow(), builder.getOnClicked());
         };
     }
     
@@ -113,6 +113,8 @@ public class Middleman {
         int getColor();
         
         int getHoveredColor();
+        
+        boolean isShadow();
         
         Runnable getOnClicked();
     }

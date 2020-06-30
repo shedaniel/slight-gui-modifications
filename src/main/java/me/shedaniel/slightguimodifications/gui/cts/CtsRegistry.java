@@ -76,6 +76,8 @@ public class CtsRegistry {
                              "        align = \"left\"\n" +
                              "        // Color of the text, default is 0xFFFFFF\n" +
                              "        color = 0xFFFFFF\n" +
+                             "        // Whether the label has a shadow, default is false\n" +
+                             "        shadow = true\n" +
                              "        // Mouse Hovered Color of the text, default is 0xFFFFFF\n" +
                              "        hoveredColor = 0xFFFFFF\n" +
                              "        // Mouse Click Function, default is nothing, here's a list of options\n" +

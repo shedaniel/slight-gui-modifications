@@ -13,13 +13,15 @@ import org.jetbrains.annotations.NotNull;
 public class LabelWidget extends AbstractButtonWidget {
     private int alignment, color, hoveredColor;
     private Runnable onClicked;
+    private boolean hasShadow;
     
-    public LabelWidget(int x, int y, int alignment, @NotNull Text text, int color, int hoveredColor, @NotNull Runnable onClicked) {
+    public LabelWidget(int x, int y, int alignment, @NotNull Text text, int color, int hoveredColor, boolean hasShadow, @NotNull Runnable onClicked) {
         super(x, y, 0, 0, text.unwrap());
         this.alignment = alignment;
         this.color = color;
         this.hoveredColor = hoveredColor;
         this.onClicked = onClicked;
+        this.hasShadow = hasShadow;
     }
     
     @Override
@@ -37,7 +39,8 @@ public class LabelWidget extends AbstractButtonWidget {
         } else if (alignment == 2) {
             x -= textRenderer.getWidth(getMessage());
         }
-        textRenderer.draw(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        if (hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        else textRenderer.drawWithShadow(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
     }
     
     @Override

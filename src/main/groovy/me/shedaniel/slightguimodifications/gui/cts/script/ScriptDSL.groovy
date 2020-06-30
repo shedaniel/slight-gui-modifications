@@ -252,6 +252,7 @@ class ScriptDSL {
         PositionBuilder position = new PositionBuilder()
         int color = 0xFFFFFF
         int hoveredColor = 0xFFFFFF
+        boolean shadow = false
         Closure onClicked = {}
 
         def position(configure) {
