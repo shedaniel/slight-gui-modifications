@@ -8,14 +8,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ContainerScreen.class)
 public class MixinContainerScreen {
-    @ModifyArg(method = "render", index = 4,
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/ContainerScreen;fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", ordinal = 0))
+    @ModifyArg(method = "render", index = 5,
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/client/gui/screen/ingame/ContainerScreen;fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
+                        ordinal = 0))
     private int renderSlotHighlight1(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;
     }
     
-    @ModifyArg(method = "render", index = 5,
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/ContainerScreen;fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", ordinal = 0))
+    @ModifyArg(method = "render", index = 6,
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/client/gui/screen/ingame/ContainerScreen;fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
+                        ordinal = 0))
     private int renderSlotHighlight2(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;
     }
