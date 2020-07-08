@@ -47,6 +47,8 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         @ConfigEntry.Gui.CollapsibleObject
         public TextFieldModifications textFieldModifications = new TextFieldModifications();
         @ConfigEntry.Gui.CollapsibleObject
+        public SliderModifications sliderModifications = new SliderModifications();
+        @ConfigEntry.Gui.CollapsibleObject
         public DebugInformation debugInformation = new DebugInformation();
         @ConfigEntry.Gui.CollapsibleObject
         public CustomScaling customScaling = new CustomScaling();
@@ -105,6 +107,15 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
                     return "text.autoconfig.slightguimodifications.option.gui.textFieldModifications.selectionMode." + name().toLowerCase(Locale.ROOT);
                 }
             }
+        }
+        
+        public static class SliderModifications {
+            @Comment("Whether this module is enabled.")
+            public boolean enabled = false;
+            public int grabberWidth = 8;
+            @Comment("Whether to use custom texture:\n/assets/slightguimodifications/textures/gui/slider(_hovered).png\nor\n/config/slightguimodifications/slider(_hovered).png")
+            @ConfigEntry.Gui.Tooltip(count = 4)
+            public boolean customBackgroundTexture = false;
         }
         
         public static class DebugInformation {

@@ -6,10 +6,10 @@
   "client": [
     "MixinBookEditScreen", "MixinChatScreen", "MixinContainerScreen", "MixinCubeMapRenderer", "MixinDrawableHelper", "MixinEntryListWidget",
     "MixinGameRenderer", "MixinInGameHud", "MixinInventoryScreen", "MixinItemRenderer", "MixinKeyboard", "MixinMinecraftClient",
-    "MixinMultiplayerServerListWidget$ServerEntry", "MixinScreen", "MixinScreenshotUtils", "MixinSettingsScreen", "MixinSplashTextResourceSupplier",
-    "MixinTextFieldWidget", "MixinTextRenderer", "MixinTitleScreen", "MixinToastManager", "MixinWorldListWidget$Entry", "TitleScreenHooks",
-    "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen", "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen",
-    "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
+    "MixinMultiplayerServerListWidget$ServerEntry", "MixinScreen", "MixinScreenshotUtils", "MixinSettingsScreen", "MixinSliderWidget",
+    "MixinSplashTextResourceSupplier", "MixinTextFieldWidget", "MixinTextRenderer", "MixinTitleScreen", "MixinToastManager", "MixinWorldListWidget$Entry",
+    "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen", "rei.MixinOverlaySearchField",
+    "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
   ],
   "injectors": {
     "defaultRequire": 1

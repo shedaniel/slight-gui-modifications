@@ -45,6 +45,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.Optional;
 
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.getUnsafely;
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
@@ -260,8 +261,8 @@ public class SlightGuiModifications implements ClientModInitializer {
             if (SlightGuiModifications.getGuiConfig().rightClickActions && mouseButton == 1) {
                 // Pause Menu
                 if (screen instanceof GameMenuScreen || screen instanceof TitleScreen) {
-                    AbstractButtonWidget optionsButton = screen.buttons.stream().filter(button -> button.getMessage().equals(I18n.translate("menu.options"))).findFirst().get();
-                    if (optionsButton.isMouseOver(mouseX, mouseY)) {
+                    Optional<AbstractButtonWidget> optionsButton = screen.buttons.stream().filter(button -> button != null && button.getMessage().getString().equals(I18n.translate("menu.options"))).findFirst();
+                    if (optionsButton.isPresent() && optionsButton.get().isMouseOver(mouseX, mouseY)) {
                         ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
                                 ImmutableList.of(
                                         new TextMenuEntry(I18n.translate("options.video").replace("...", ""), () -> {
@@ -325,6 +326,52 @@ public class SlightGuiModifications implements ClientModInitializer {
                     public InputStream toInputStream() {
                         try {
                             return new FileInputStream(textField);
+                        } catch (FileNotFoundException e) {
+                            return null;
+                        }
+                    }
+                });
+            }
+            File slider = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider.png");
+            if (slider.exists()) {
+                builder.add(new Identifier("slightguimodifications:textures/gui/slider.png"), new ArtificeResource<FileInputStream>() {
+                    @Override
+                    public FileInputStream getData() {
+                        return null;
+                    }
+            
+                    @Override
+                    public String toOutputString() {
+                        return null;
+                    }
+            
+                    @Override
+                    public InputStream toInputStream() {
+                        try {
+                            return new FileInputStream(slider);
+                        } catch (FileNotFoundException e) {
+                            return null;
+                        }
+                    }
+                });
+            }
+            File sliderHovered = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider_hovered.png");
+            if (sliderHovered.exists()) {
+                builder.add(new Identifier("slightguimodifications:textures/gui/slider_hovered.png"), new ArtificeResource<FileInputStream>() {
+                    @Override
+                    public FileInputStream getData() {
+                        return null;
+                    }
+            
+                    @Override
+                    public String toOutputString() {
+                        return null;
+                    }
+            
+                    @Override
+                    public InputStream toInputStream() {
+                        try {
+                            return new FileInputStream(sliderHovered);
                         } catch (FileNotFoundException e) {
                             return null;
                         }
