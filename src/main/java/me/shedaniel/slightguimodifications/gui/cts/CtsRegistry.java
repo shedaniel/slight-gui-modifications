@@ -1,12 +1,11 @@
 package me.shedaniel.slightguimodifications.gui.cts;
 
+import groovy.lang.GroovyShell;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Lazy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
@@ -16,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public class CtsRegistry {
     public static final Logger LOGGER = LogManager.getLogger("CtsRegistry");
     
-    private static final Lazy<ScriptEngine> ENGINE = new Lazy<>(() -> new ScriptEngineManager().getEngineByName("groovy"));
+    private static final Lazy<GroovyShell> SHELL = new Lazy<>(GroovyShell::new);
     
     public static void loadScriptsAsync() {
         CompletableFuture.runAsync(CtsRegistry::loadScripts);
@@ -115,7 +114,7 @@ public class CtsRegistry {
             List<String> lines = Files.readAllLines(scriptFile.toPath());
             lines.add(0, "import static me.shedaniel.slightguimodifications.gui.cts.script.ScriptDSL.*\n");
             String content = String.join("\n", lines);
-            ENGINE.get().eval(content);
+            SHELL.get().evaluate(content);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
