@@ -6,6 +6,7 @@ import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -111,6 +112,16 @@ public class MixinTitleScreen extends Screen {
                 RenderSystem.color4f(1, 1, 1, 0);
             else
                 RenderSystem.color4f(1, 1, 1, this.doBackgroundFade ? (float) MathHelper.ceil(MathHelper.clamp((float) (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0F, 0.0F, 1.0F)) : 1.0F);
+    }
+    
+    @Redirect(method = "render",
+              at = @At(value = "INVOKE",
+                       target = "Lnet/minecraft/client/gui/screen/TitleScreen;drawStringWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"))
+    private void stringRender(TitleScreen titleScreen, MatrixStack matrices, TextRenderer textRenderer, String text, int x, int y, int color) {
+        if (SlightGuiModifications.getCtsConfig().enabled)
+            if (SlightGuiModifications.getCtsConfig().clearAllLabels)
+                return;
+        titleScreen.drawStringWithShadow(matrices, textRenderer, text, x, y, color);
     }
     
     @Inject(method = "areRealmsNotificationsEnabled", at = @At("HEAD"), cancellable = true)

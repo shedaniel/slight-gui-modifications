@@ -39,7 +39,7 @@ public class LabelWidget extends AbstractButtonWidget {
         } else if (alignment == 2) {
             x -= textRenderer.getWidth(getMessage());
         }
-        if (hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        if (!hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
         else textRenderer.drawWithShadow(matrices, this.getMessage(), x, this.y, j | MathHelper.ceil(this.alpha * 255.0F) << 24);
     }
     

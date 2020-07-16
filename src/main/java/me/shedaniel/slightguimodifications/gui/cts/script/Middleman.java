@@ -5,6 +5,7 @@ import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.Position;
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
+import me.shedaniel.slightguimodifications.gui.cts.widgets.CustomizedButtonWidget;
 import me.shedaniel.slightguimodifications.gui.cts.widgets.LabelWidget;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -17,18 +18,19 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerWarningScreen;
 import net.minecraft.client.gui.screen.options.AccessibilityScreen;
 import net.minecraft.client.gui.screen.options.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.realms.RealmsBridge;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Lazy;
 import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 
 public class Middleman {
     public static Text modMenuText() {
@@ -86,6 +88,7 @@ public class Middleman {
     }
     
     public static void reloadCts() {
+        SlightGuiModifications.resetCts();
         SlightGuiModifications.reloadCts();
         MinecraftClient.getInstance().openScreen(new TitleScreen());
     }
@@ -128,7 +131,7 @@ public class Middleman {
             if (builder.getAlign().equals("center")) alignInt = -0.5;
             if (builder.getAlign().equals("right")) alignInt = -1;
             if (alignInt == -1.0) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new ButtonWidget((int) (position.getX(window.getScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run());
+            return new CustomizedButtonWidget((int) (position.getX(window.getScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run(), new Lazy<>(builder.getTexture()::provide), new Lazy<>(builder.getHoveredTexture()::provide));
         };
     }
     
@@ -144,6 +147,10 @@ public class Middleman {
         int getHeight();
         
         Runnable getOnClicked();
+        
+        SlightGuiModificationsConfig.Cts.TextureProvider getTexture();
+        
+        SlightGuiModificationsConfig.Cts.TextureProvider getHoveredTexture();
     }
     
     public static SlightGuiModificationsConfig.Cts.TextureProvider file(String file) {
@@ -177,10 +184,11 @@ public class Middleman {
         @Override
         public Identifier provide() {
             try {
+                if (!file.exists()) throw new NoSuchFileException(file.getAbsolutePath());
                 TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
                 return textureManager.registerDynamicTexture(file.getName() + "_" + file.length(), new NativeImageBackedTexture(NativeImage.read(new FileInputStream(file.toPath().normalize().toFile()))));
             } catch (IOException e) {
-                e.printStackTrace();
+                SlightGuiModifications.LOGGER.error("Failed to load image at " + file.getAbsolutePath(), e);
                 return new Identifier("missingno");
             }
         }

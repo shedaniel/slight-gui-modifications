@@ -113,7 +113,8 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
             @Comment("Whether this module is enabled.")
             public boolean enabled = false;
             public int grabberWidth = 8;
-            @Comment("Whether to use custom texture:\n/assets/slightguimodifications/textures/gui/slider(_hovered).png\nor\n/config/slightguimodifications/slider(_hovered).png")
+            @Comment(
+                    "Whether to use custom texture:\n/assets/slightguimodifications/textures/gui/slider(_hovered).png\nor\n/config/slightguimodifications/slider(_hovered).png")
             @ConfigEntry.Gui.Tooltip(count = 4)
             public boolean customBackgroundTexture = false;
         }
@@ -147,6 +148,7 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         public boolean removeMinecraftEditionTexture = false;
         public boolean removeMinecraftLogoTexture = false;
         public boolean clearAllButtons = false;
+        public boolean clearAllLabels = false;
         public List<WidgetElement> widgetElements = new ArrayList<>();
         public List<BackgroundInfo> backgroundInfos = new ArrayList<>(Collections.singletonList(new DefaultBackgroundInfo()));
         public long backgroundStayLength = 10000;

@@ -114,6 +114,10 @@ class ScriptDSL {
             SlightGuiModifications.getCtsConfig().clearAllButtons = true
         }
 
+        def clearAllLabels() {
+            SlightGuiModifications.getCtsConfig().clearAllLabels = true
+        }
+
         def splashText(Closure configure) {
             splashText.tap(configure)
         }
@@ -267,6 +271,8 @@ class ScriptDSL {
 
     static class ButtonBuilder implements Middleman.ButtonBuilder {
         Text text = literal("")
+        SlightGuiModificationsConfig.Cts.TextureProvider texture = { null }
+        SlightGuiModificationsConfig.Cts.TextureProvider hoveredTexture = { null }
         String align = "left"
         PositionBuilder position = new PositionBuilder()
         Closure onClicked = {}

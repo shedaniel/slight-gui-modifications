@@ -12,6 +12,7 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
 import me.shedaniel.cloth.api.client.events.v0.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.api.LazyResettable;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
@@ -38,6 +39,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.math.MathHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,6 +64,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static Identifier lastPrettyScreenshotTextureId = null;
     public static long prettyScreenshotTime = -1;
     public static long backgroundTime = -1;
+    public static final Logger LOGGER = LogManager.getLogger("SlightGuiModifications");
     
     private static final Lazy<Object> COLOR_OBJ = new Lazy<>(() -> {
         try {
@@ -339,12 +343,12 @@ public class SlightGuiModifications implements ClientModInitializer {
                     public FileInputStream getData() {
                         return null;
                     }
-            
+                    
                     @Override
                     public String toOutputString() {
                         return null;
                     }
-            
+                    
                     @Override
                     public InputStream toInputStream() {
                         try {
@@ -362,12 +366,12 @@ public class SlightGuiModifications implements ClientModInitializer {
                     public FileInputStream getData() {
                         return null;
                     }
-            
+                    
                     @Override
                     public String toOutputString() {
                         return null;
                     }
-            
+                    
                     @Override
                     public InputStream toInputStream() {
                         try {
@@ -381,13 +385,13 @@ public class SlightGuiModifications implements ClientModInitializer {
         });
     }
     
+    public static final LazyResettable<SlightGuiModificationsConfig.Cts> CTS = new LazyResettable<>(SlightGuiModificationsConfig.Cts::new);
+    
     public static void reloadCtsAsync() {
-        cts = new SlightGuiModificationsConfig.Cts();
         CtsRegistry.loadScriptsAsync();
     }
     
     public static void reloadCts() {
-        cts = new SlightGuiModificationsConfig.Cts();
         CtsRegistry.loadScripts();
     }
     
@@ -426,10 +430,12 @@ public class SlightGuiModifications implements ClientModInitializer {
         return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig().gui;
     }
     
-    private static SlightGuiModificationsConfig.Cts cts = new SlightGuiModificationsConfig.Cts();
-    
     public static SlightGuiModificationsConfig.Cts getCtsConfig() {
-        return cts;
+        return CTS.get();
+    }
+    
+    public static void resetCts() {
+        CTS.reset();
     }
     
     public static float getSpeed() {
@@ -447,6 +453,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             });
             builder.setAfterInitConsumer(screen -> {
                 ((ScreenHooks) screen).cloth$addButtonWidget(new ButtonWidget(screen.width - 104, 4, 100, 20, new TranslatableText("text.slightguimodifications.reloadCts"), button -> {
+                    SlightGuiModifications.resetCts();
                     SlightGuiModifications.reloadCts();
                 }));
             });
