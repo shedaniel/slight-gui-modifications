@@ -18,11 +18,11 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerWarningScreen;
 import net.minecraft.client.gui.screen.options.AccessibilityScreen;
 import net.minecraft.client.gui.screen.options.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.realms.gui.screen.RealmsBridgeScreen;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.Window;
-import net.minecraft.realms.RealmsBridge;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.Util;
@@ -83,7 +83,7 @@ public class Middleman {
     
     public static void realms() {
         MinecraftClient client = MinecraftClient.getInstance();
-        RealmsBridge realmsBridge = new RealmsBridge();
+        RealmsBridgeScreen realmsBridge = new RealmsBridgeScreen();
         realmsBridge.switchToRealms(client.currentScreen);
     }
     

@@ -25,7 +25,7 @@ public abstract class MixinTextRenderer {
     }
     
     @ModifyVariable(
-            method = "drawLayer(Lnet/minecraft/text/StringRenderable;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F",
+            method = "drawLayer(Lnet/minecraft/text/OrderedText;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)F",
             ordinal = 0, at = @At("HEAD"))
     private int drawLayerStringRenderableChangeColor(int color) {
         Screen screen = MinecraftClient.getInstance().currentScreen;

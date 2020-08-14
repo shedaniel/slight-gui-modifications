@@ -38,8 +38,8 @@ dependencies {
     }
     depend("com.github.Chocohead:Fabric-ASM:${project.fabric_asm_version}")
 //    optionally("me.shedaniel:SmoothScrollingEverywhere:3.0.1-unstable")
-    optionally("me.shedaniel:RoughlyEnoughItems:4.5.5")
-    optionally("io.github.prospector:modmenu:1.12.2+build.17")
+    optionally("me.shedaniel:RoughlyEnoughItems:5.2.3")
+    optionally("io.github.prospector:modmenu:1.14.6+build.31")
     depend("me.shedaniel.cloth:config-2:${project.cloth_config}")
     depend("me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_api}")
     depend("me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u}")

@@ -167,7 +167,6 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
                 long fullIterationLength = ctsConfig.backgroundStayLength * ctsConfig.backgroundInfos.size();
                 long timePast = (Util.getMeasuringTimeMs() - SlightGuiModifications.backgroundTime) % fullIterationLength;
                 if (timePast >= index * ctsConfig.backgroundStayLength && timePast < (index + 1) * ctsConfig.backgroundStayLength)
-//                    return MathHelper.clamp((timePast - index * ctsConfig.backgroundStayLength) / (float) ctsConfig.backgroundFadeLength, 0, 1);
                     return 1;
                 if (timePast >= (index + 1) * ctsConfig.backgroundStayLength && timePast < (index + 1) * ctsConfig.backgroundStayLength + ctsConfig.backgroundFadeLength)
                     return MathHelper.clamp(((index + 1) * ctsConfig.backgroundStayLength + ctsConfig.backgroundFadeLength - timePast) / (float) ctsConfig.backgroundFadeLength, 0, 1);

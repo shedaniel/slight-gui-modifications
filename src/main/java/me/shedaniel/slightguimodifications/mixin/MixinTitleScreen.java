@@ -117,11 +117,11 @@ public class MixinTitleScreen extends Screen {
     @Redirect(method = "render",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/gui/screen/TitleScreen;drawStringWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"))
-    private void stringRender(TitleScreen titleScreen, MatrixStack matrices, TextRenderer textRenderer, String text, int x, int y, int color) {
+    private void stringRender(MatrixStack matrices, TextRenderer textRenderer, String text, int x, int y, int color) {
         if (SlightGuiModifications.getCtsConfig().enabled)
             if (SlightGuiModifications.getCtsConfig().clearAllLabels)
                 return;
-        titleScreen.drawStringWithShadow(matrices, textRenderer, text, x, y, color);
+        DrawableHelper.drawStringWithShadow(matrices, textRenderer, text, x, y, color);
     }
     
     @Inject(method = "areRealmsNotificationsEnabled", at = @At("HEAD"), cancellable = true)
