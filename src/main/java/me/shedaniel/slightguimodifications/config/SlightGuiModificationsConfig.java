@@ -3,6 +3,7 @@ package me.shedaniel.slightguimodifications.config;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
@@ -11,14 +12,13 @@ import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Lazy;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.LazyLoadedValue;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.ElementType;
@@ -124,6 +124,7 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         }
         
         public static class CustomScaling {
+            public boolean vanillaScaleSlider = false;
             @ScaleSlider
             public double scale = 1;
         }
@@ -165,46 +166,46 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
                 if (ctsConfig.backgroundInfos.size() == 1) return 1;
                 int index = index();
                 long fullIterationLength = ctsConfig.backgroundStayLength * ctsConfig.backgroundInfos.size();
-                long timePast = (Util.getMeasuringTimeMs() - SlightGuiModifications.backgroundTime) % fullIterationLength;
+                long timePast = (Util.getMillis() - SlightGuiModifications.backgroundTime) % fullIterationLength;
                 if (timePast >= index * ctsConfig.backgroundStayLength && timePast < (index + 1) * ctsConfig.backgroundStayLength)
                     return 1;
                 if (timePast >= (index + 1) * ctsConfig.backgroundStayLength && timePast < (index + 1) * ctsConfig.backgroundStayLength + ctsConfig.backgroundFadeLength)
-                    return MathHelper.clamp(((index + 1) * ctsConfig.backgroundStayLength + ctsConfig.backgroundFadeLength - timePast) / (float) ctsConfig.backgroundFadeLength, 0, 1);
+                    return Mth.clamp(((index + 1) * ctsConfig.backgroundStayLength + ctsConfig.backgroundFadeLength - timePast) / (float) ctsConfig.backgroundFadeLength, 0, 1);
                 if (index == ctsConfig.backgroundInfos.size() - 1 && timePast <= ctsConfig.backgroundFadeLength)
-                    return MathHelper.clamp((ctsConfig.backgroundFadeLength - timePast) / (float) ctsConfig.backgroundFadeLength, 0, 1);
+                    return Mth.clamp((ctsConfig.backgroundFadeLength - timePast) / (float) ctsConfig.backgroundFadeLength, 0, 1);
                 return 0;
             }
             
-            public abstract void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha);
+            public abstract void render(PoseStack matrices, TitleScreen screen, float delta, float alpha);
         }
         
         public static class DefaultBackgroundInfo extends BackgroundInfo {
             @Override
-            public void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha) {
-                MinecraftClient.getInstance().getTextureManager().bindTexture(TitleScreen.PANORAMA_OVERLAY);
-                screen.backgroundRenderer.render(delta, MathHelper.clamp(alpha * getAlpha(), 0.0F, 1.0F));
+            public void render(PoseStack matrices, TitleScreen screen, float delta, float alpha) {
+                Minecraft.getInstance().getTextureManager().bind(TitleScreen.PANORAMA_OVERLAY);
+                screen.panorama.render(delta, Mth.clamp(alpha * getAlpha(), 0.0F, 1.0F));
             }
         }
         
         public static class TextureProvidedBackgroundInfo extends BackgroundInfo {
-            private final Lazy<Identifier> provider;
+            private final LazyLoadedValue<ResourceLocation> provider;
             
             public TextureProvidedBackgroundInfo(TextureProvider provider) {
-                this.provider = new Lazy<>(provider::provide);
+                this.provider = new LazyLoadedValue<>(provider::provide);
             }
             
             @Override
-            public void render(MatrixStack matrices, TitleScreen screen, float delta, float alpha) {
-                MinecraftClient.getInstance().getTextureManager().bindTexture(provider.get());
+            public void render(PoseStack matrices, TitleScreen screen, float delta, float alpha) {
+                Minecraft.getInstance().getTextureManager().bind(provider.get());
                 RenderSystem.enableBlend();
-                RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+                RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, getAlpha());
-                DrawableHelper.drawTexture(matrices, 0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
+                GuiComponent.blit(matrices, 0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
             }
         }
         
         public interface TextureProvider {
-            Identifier provide();
+            ResourceLocation provide();
         }
         
         public static class SplashText {

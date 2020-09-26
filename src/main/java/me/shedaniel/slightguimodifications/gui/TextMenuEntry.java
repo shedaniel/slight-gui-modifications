@@ -1,14 +1,13 @@
 package me.shedaniel.slightguimodifications.gui;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundEvents;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
 
 public class TextMenuEntry extends MenuEntry {
     public final String text;
@@ -18,12 +17,12 @@ public class TextMenuEntry extends MenuEntry {
     private Runnable runnable;
     
     public TextMenuEntry(String string, Runnable runnable) {
-        this.text = I18n.translate(string);
+        this.text = I18n.get(string);
         this.runnable = runnable;
     }
     
     private int getTextWidth() {
-        if (textWidth == -69) this.textWidth = Math.max(0, MinecraftClient.getInstance().textRenderer.getStringWidth(text));
+        if (textWidth == -69) this.textWidth = Math.max(0, Minecraft.getInstance().font.width(text));
         return this.textWidth;
     }
     
@@ -34,7 +33,7 @@ public class TextMenuEntry extends MenuEntry {
     public int getEntryHeight() {return 12;}
     
     @Override
-    public List<? extends Element> children() {return Collections.emptyList();}
+    public List<? extends GuiEventListener> children() {return Collections.emptyList();}
     
     @Override
     public void updateInformation(int xPos, int yPos, boolean selected, boolean containsMouse, boolean rendering, int width) {
@@ -47,15 +46,15 @@ public class TextMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
-        MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
+        Minecraft.getInstance().font.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
     }
     
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY < y + 12) {
-            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             runnable.run();
             return true;
         }

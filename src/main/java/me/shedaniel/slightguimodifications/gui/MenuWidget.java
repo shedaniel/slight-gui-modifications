@@ -1,20 +1,20 @@
 package me.shedaniel.slightguimodifications.gui;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
 
-public class MenuWidget extends AbstractParentElement implements Drawable {
+public class MenuWidget extends AbstractContainerEventHandler implements Widget {
     public final Point menuStartPoint;
     private final List<MenuEntry> entries = Lists.newArrayList();
     public final ScrollingContainer scrolling = new ScrollingContainer() {
@@ -34,7 +34,7 @@ public class MenuWidget extends AbstractParentElement implements Drawable {
     
     public MenuWidget(Point menuStartPoint, Collection<MenuEntry> entries) {
         buildEntries(entries);
-        if (menuStartPoint.y + scrolling.getMaxScrollHeight() >= MinecraftClient.getInstance().currentScreen.height - 5)
+        if (menuStartPoint.y + scrolling.getMaxScrollHeight() >= Minecraft.getInstance().screen.height - 5)
             menuStartPoint.y -= scrolling.getMaxScrollHeight();
         this.menuStartPoint = menuStartPoint;
     }
@@ -52,7 +52,7 @@ public class MenuWidget extends AbstractParentElement implements Drawable {
     
     public boolean hasScrollBar() {return scrolling.getMaxScrollHeight() > getInnerHeight();}
     
-    public int getInnerHeight() {return Math.min(scrolling.getMaxScrollHeight(), MinecraftClient.getInstance().currentScreen.height - 5 - menuStartPoint.y);}
+    public int getInnerHeight() {return Math.min(scrolling.getMaxScrollHeight(), Minecraft.getInstance().screen.height - 5 - menuStartPoint.y);}
     
     public int getMaxEntryWidth() {
         int i = 0;
@@ -61,7 +61,7 @@ public class MenuWidget extends AbstractParentElement implements Drawable {
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         Rectangle bounds = getBounds();
         Rectangle innerBounds = getInnerBounds();
         fill(matrices, bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), -6250336);

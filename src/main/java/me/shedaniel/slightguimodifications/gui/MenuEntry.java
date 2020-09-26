@@ -1,9 +1,9 @@
 package me.shedaniel.slightguimodifications.gui;
 
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 
-public abstract class MenuEntry extends AbstractParentElement implements Drawable {
+public abstract class MenuEntry extends AbstractContainerEventHandler implements Widget {
     @Deprecated MenuWidget parent = null;
     
     public final MenuWidget getParent() {return parent;}

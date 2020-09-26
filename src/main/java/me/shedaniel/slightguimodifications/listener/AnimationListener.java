@@ -1,6 +1,6 @@
 package me.shedaniel.slightguimodifications.listener;
 
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public interface AnimationListener {
     float slightguimodifications_getEasedMouseY();

@@ -1,8 +1,8 @@
 package me.shedaniel.slightguimodifications.gui.cts.elements;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.screens.Screen;
 
 public interface WidgetElement {
-    AbstractButtonWidget build(Screen screen);
+    AbstractWidget build(Screen screen);
 }

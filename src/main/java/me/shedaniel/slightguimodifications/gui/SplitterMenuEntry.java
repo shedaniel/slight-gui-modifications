@@ -1,10 +1,9 @@
 package me.shedaniel.slightguimodifications.gui;
 
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
 public class SplitterMenuEntry extends MenuEntry {
     private int x, y, width;
@@ -17,7 +16,7 @@ public class SplitterMenuEntry extends MenuEntry {
     public int getEntryHeight() {return 5;}
     
     @Override
-    public List<? extends Element> children() {return Collections.emptyList();}
+    public List<? extends GuiEventListener> children() {return Collections.emptyList();}
     
     @Override
     public void updateInformation(int xPos, int yPos, boolean selected, boolean containsMouse, boolean rendering, int width) {
@@ -30,7 +29,7 @@ public class SplitterMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         fillGradient(matrices, x + 3, y + 2, x + width - 3, y + 3, -7829368, -7829368);
     }
     

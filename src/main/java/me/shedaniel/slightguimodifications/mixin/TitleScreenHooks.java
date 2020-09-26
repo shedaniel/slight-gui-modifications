@@ -1,14 +1,14 @@
 package me.shedaniel.slightguimodifications.mixin;
 
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(TitleScreen.class)
 public interface TitleScreenHooks {
-    @Accessor("doBackgroundFade")
+    @Accessor("fading")
     boolean isDoBackgroundFade();
     
-    @Accessor("backgroundFadeStart")
+    @Accessor("fadeInStart")
     long getBackgroundFadeStart();
 }

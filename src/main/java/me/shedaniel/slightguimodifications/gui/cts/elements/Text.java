@@ -1,16 +1,15 @@
 package me.shedaniel.slightguimodifications.gui.cts.elements;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-
 import java.util.stream.Stream;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public final class Text {
-    private MutableText text;
+    private MutableComponent text;
     
-    private Text(MutableText text) {
+    private Text(MutableComponent text) {
         this.text = text;
     }
     
@@ -23,7 +22,7 @@ public final class Text {
     }
     
     public String asString() {
-        return this.text.asString();
+        return this.text.getContents();
     }
     
     public String getString() {
@@ -31,38 +30,38 @@ public final class Text {
     }
     
     public String asTruncatedString(int length) {
-        return this.text.asTruncatedString(length);
+        return this.text.getString(length);
     }
     
     public Text copy() {
-        return wrap(this.text.copy());
+        return wrap(this.text.plainCopy());
     }
     
     public Text shallowCopy() {
-        return wrap(this.text.shallowCopy());
+        return wrap(this.text.copy());
     }
     
     public Text formatted(String... s) {
-        return wrap(this.text.formatted(Stream.of(s).map(Formatting::byName).toArray(Formatting[]::new)));
+        return wrap(this.text.withStyle(Stream.of(s).map(ChatFormatting::getByName).toArray(ChatFormatting[]::new)));
     }
     
     public static Text literal(String s) {
-        return wrap(new LiteralText(s));
+        return wrap(new TextComponent(s));
     }
     
     public static Text translatable(String s, Object... objects) {
-        return wrap(new TranslatableText(s, Stream.of(objects).map(o -> {
+        return wrap(new TranslatableComponent(s, Stream.of(objects).map(o -> {
             if (o instanceof Text)
                 return ((Text) o).text;
             return o;
         }).toArray()));
     }
     
-    private static Text wrap(MutableText text) {
+    private static Text wrap(MutableComponent text) {
         return new Text(text);
     }
     
-    public net.minecraft.text.Text unwrap() {
+    public net.minecraft.network.chat.Component unwrap() {
         return text;
     }
 }

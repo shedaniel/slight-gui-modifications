@@ -1,10 +1,11 @@
 package me.shedaniel.slightguimodifications.mixin;
 
+import com.mojang.blaze3d.platform.Window;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.Window;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,27 +16,23 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MinecraftClient.class)
-public abstract class MixinMinecraftClient {
-    @Shadow
-    public Screen currentScreen;
+@Mixin(Minecraft.class)
+public abstract class MixinMinecraft {
+    @Shadow @Nullable public Screen screen;
     @Shadow @Final private Window window;
-    
-    @Shadow
-    public abstract boolean forcesUnicodeFont();
     
     @Unique
     private Screen lastScreen;
     
-    @Inject(method = "openScreen", at = @At("HEAD"))
+    @Inject(method = "setScreen", at = @At("HEAD"))
     private void preOpenScreen(Screen screen, CallbackInfo ci) {
-        this.lastScreen = this.currentScreen;
+        this.lastScreen = this.screen;
     }
     
-    @Inject(method = "openScreen", at = @At("RETURN"))
+    @Inject(method = "setScreen", at = @At("RETURN"))
     private void openScreen(Screen screen, CallbackInfo ci) {
-        if (this.currentScreen != null)
-            ((AnimationListener) this.currentScreen).slightguimodifications_openScreen(this.lastScreen);
+        if (this.screen != null)
+            ((AnimationListener) this.screen).slightguimodifications_openScreen(this.lastScreen);
         this.lastScreen = null;
     }
     
@@ -46,7 +43,7 @@ public abstract class MixinMinecraftClient {
         }
     }
     
-    @ModifyArg(method = "onResolutionChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setScaleFactor(D)V", ordinal = 0),
+    @ModifyArg(method = "resizeDisplay", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V", ordinal = 0),
                index = 0)
     private double getGuiScale(double scale) {
         if (SlightGuiModifications.getGuiConfig().customScaling.scale <= 1) return scale;

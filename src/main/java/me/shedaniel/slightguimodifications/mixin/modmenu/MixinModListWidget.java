@@ -2,12 +2,12 @@ package me.shedaniel.slightguimodifications.mixin.modmenu;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.prospector.modmenu.gui.ModListWidget;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,28 +16,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("rawtypes")
 @Mixin(ModListWidget.class)
-public class MixinModListWidget extends EntryListWidget {
-    public MixinModListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+public class MixinModListWidget extends AbstractSelectionList {
+    public MixinModListWidget(Minecraft client, int width, int height, int top, int bottom, int itemHeight) {
         super(client, width, height, top, bottom, itemHeight);
     }
     
     @Inject(method = "renderList",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;begin(ILnet/minecraft/client/render/VertexFormat;)V"))
-    private void preSelectionBufferDraw(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(ILcom/mojang/blaze3d/vertex/VertexFormat;)V"))
+    private void preSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
         RenderSystem.disableAlphaTest();
-        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
         RenderSystem.shadeModel(GL11.GL_SMOOTH);
-        float alpha = ((AnimationListener) client.currentScreen).slightguimodifications_getAlpha();
+        float alpha = ((AnimationListener) minecraft.screen).slightguimodifications_getAlpha();
         if (alpha >= 0) {
             SlightGuiModifications.setAlpha(alpha);
         }
     }
     
     @Inject(method = "renderList",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Tessellator;draw()V", shift = At.Shift.AFTER))
-    private void postSelectionBufferDraw(MatrixStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
+    private void postSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         RenderSystem.popMatrix();
         SlightGuiModifications.restoreAlpha();
     }

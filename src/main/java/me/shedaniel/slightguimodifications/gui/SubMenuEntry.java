@@ -1,14 +1,13 @@
 package me.shedaniel.slightguimodifications.gui;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.gui.widget.TabWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -31,7 +30,7 @@ public class SubMenuEntry extends MenuEntry {
     }
     
     private int getTextWidth() {
-        if (textWidth == -69) this.textWidth = Math.max(0, MinecraftClient.getInstance().textRenderer.getStringWidth(text));
+        if (textWidth == -69) this.textWidth = Math.max(0, Minecraft.getInstance().font.width(text));
         return this.textWidth;
     }
     
@@ -57,7 +56,7 @@ public class SubMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
         if (selected && !entries.isEmpty()) {
             MenuWidget menu = getMenuWidget();
@@ -68,10 +67,10 @@ public class SubMenuEntry extends MenuEntry {
             menu.render(matrices, mouseX, mouseY, delta);
             for (Rectangle area : areas) ScissorsHandler.INSTANCE.scissor(area);
         }
-        MinecraftClient.getInstance().textRenderer.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
+        Minecraft.getInstance().font.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
         if (!entries.isEmpty()) {
-            MinecraftClient.getInstance().getTextureManager().bindTexture(TabWidget.CHEST_GUI_TEXTURE);
-            drawTexture(matrices, x + width - 15, y - 2, 0, 28, 18, 18);
+            Minecraft.getInstance().getTextureManager().bind(TabWidget.CHEST_GUI_TEXTURE);
+            blit(matrices, x + width - 15, y - 2, 0, 28, 18, 18);
         }
     }
     
@@ -85,7 +84,7 @@ public class SubMenuEntry extends MenuEntry {
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {return menuWidget != null && !menuWidget.children().isEmpty() && selected && menuWidget.mouseScrolled(mouseX, mouseY, amount);}
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         if (menuWidget != null && !menuWidget.children().isEmpty() && selected) return Collections.singletonList(menuWidget);
         return Collections.emptyList();
     }

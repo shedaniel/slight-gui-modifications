@@ -5,28 +5,29 @@ import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.Position;
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
+import me.shedaniel.slightguimodifications.gui.cts.script.Middleman.FileTextureProvider;
+import me.shedaniel.slightguimodifications.gui.cts.script.Middleman.ResourceTextureProvider;
 import me.shedaniel.slightguimodifications.gui.cts.widgets.CustomizedButtonWidget;
 import me.shedaniel.slightguimodifications.gui.cts.widgets.LabelWidget;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.SettingsScreen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerWarningScreen;
-import net.minecraft.client.gui.screen.options.AccessibilityScreen;
-import net.minecraft.client.gui.screen.options.LanguageOptionsScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.client.realms.gui.screen.RealmsBridgeScreen;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Lazy;
-import net.minecraft.util.Util;
-
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.AccessibilityOptionsScreen;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
+import net.minecraft.client.gui.screens.LanguageSelectScreen;
+import net.minecraft.client.gui.screens.OptionsScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.realms.RealmsBridge;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.LazyLoadedValue;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,71 +39,71 @@ public class Middleman {
     }
     
     public static void url(String string) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        Screen screen = client.currentScreen;
-        client.openScreen(new ConfirmChatLinkScreen(open -> {
+        Minecraft client = Minecraft.getInstance();
+        Screen screen = client.screen;
+        client.setScreen(new ConfirmLinkScreen(open -> {
             if (open) {
-                Util.getOperatingSystem().open(string);
+                Util.getPlatform().openUri(string);
             }
-            client.openScreen(screen);
+            client.setScreen(screen);
         }, string, false));
     }
     
     public static void language() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.openScreen(new LanguageOptionsScreen(client.currentScreen, client.options, client.getLanguageManager()));
+        Minecraft client = Minecraft.getInstance();
+        client.setScreen(new LanguageSelectScreen(client.screen, client.options, client.getLanguageManager()));
     }
     
     public static void options() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.openScreen(new SettingsScreen(client.currentScreen, client.options));
+        Minecraft client = Minecraft.getInstance();
+        client.setScreen(new OptionsScreen(client.screen, client.options));
     }
     
     public static void exit() {
-        MinecraftClient.getInstance().scheduleStop();
+        Minecraft.getInstance().stop();
     }
     
     public static void accessibility() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.openScreen(new AccessibilityScreen(client.currentScreen, client.options));
+        Minecraft client = Minecraft.getInstance();
+        client.setScreen(new AccessibilityOptionsScreen(client.screen, client.options));
     }
     
     public static void singleplayer() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.openScreen(new SelectWorldScreen(client.currentScreen));
+        Minecraft client = Minecraft.getInstance();
+        client.setScreen(new SelectWorldScreen(client.screen));
     }
     
     public static void multiplayer() {
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client.options.skipMultiplayerWarning) {
-            client.openScreen(new MultiplayerScreen(client.currentScreen));
+            client.setScreen(new JoinMultiplayerScreen(client.screen));
         } else {
-            client.openScreen(new MultiplayerWarningScreen(client.currentScreen));
+            client.setScreen(new SafetyScreen(client.screen));
         }
     }
     
     public static void realms() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        RealmsBridgeScreen realmsBridge = new RealmsBridgeScreen();
-        realmsBridge.switchToRealms(client.currentScreen);
+        Minecraft client = Minecraft.getInstance();
+        RealmsBridge realmsBridge = new RealmsBridge();
+        realmsBridge.switchToRealms(client.screen);
     }
     
     public static void reloadCts() {
         SlightGuiModifications.resetCts();
         SlightGuiModifications.reloadCts();
-        MinecraftClient.getInstance().openScreen(new TitleScreen());
+        Minecraft.getInstance().setScreen(new TitleScreen());
     }
     
     public static WidgetElement buildFromLabel(LabelBuilder builder) {
         return screen -> {
-            Window window = MinecraftClient.getInstance().getWindow();
+            Window window = Minecraft.getInstance().getWindow();
             Position position = builder.getPositionBuilt();
             int alignInt = -1;
             if (builder.getAlign().equals("left")) alignInt = 0;
             if (builder.getAlign().equals("center")) alignInt = 1;
             if (builder.getAlign().equals("right")) alignInt = 2;
             if (alignInt == -1) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new LabelWidget(position.getX(window.getScaledWidth()), position.getY(window.getScaledHeight()), alignInt, builder.getText(), builder.getColor(), builder.getHoveredColor(), builder.isShadow(), builder.getOnClicked());
+            return new LabelWidget(position.getX(window.getGuiScaledWidth()), position.getY(window.getGuiScaledHeight()), alignInt, builder.getText(), builder.getColor(), builder.getHoveredColor(), builder.isShadow(), builder.getOnClicked());
         };
     }
     
@@ -124,14 +125,14 @@ public class Middleman {
     
     public static WidgetElement buildFromButton(ButtonBuilder builder) {
         return screen -> {
-            Window window = MinecraftClient.getInstance().getWindow();
+            Window window = Minecraft.getInstance().getWindow();
             Position position = builder.getPositionBuilt();
             double alignInt = -1.0;
             if (builder.getAlign().equals("left")) alignInt = 0;
             if (builder.getAlign().equals("center")) alignInt = -0.5;
             if (builder.getAlign().equals("right")) alignInt = -1;
             if (alignInt == -1.0) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new CustomizedButtonWidget((int) (position.getX(window.getScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run(), new Lazy<>(builder.getTexture()::provide), new Lazy<>(builder.getHoveredTexture()::provide));
+            return new CustomizedButtonWidget((int) (position.getX(window.getGuiScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getGuiScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run(), new LazyLoadedValue<>(builder.getTexture()::provide), new LazyLoadedValue<>(builder.getHoveredTexture()::provide));
         };
     }
     
@@ -162,14 +163,14 @@ public class Middleman {
     }
     
     static class ResourceTextureProvider implements SlightGuiModificationsConfig.Cts.TextureProvider {
-        private Identifier identifier;
+        private ResourceLocation identifier;
         
         ResourceTextureProvider(String identifier) {
-            this.identifier = new Identifier(identifier);
+            this.identifier = new ResourceLocation(identifier);
         }
         
         @Override
-        public Identifier provide() {
+        public ResourceLocation provide() {
             return identifier;
         }
     }
@@ -182,14 +183,14 @@ public class Middleman {
         }
         
         @Override
-        public Identifier provide() {
+        public ResourceLocation provide() {
             try {
                 if (!file.exists()) throw new NoSuchFileException(file.getAbsolutePath());
-                TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-                return textureManager.registerDynamicTexture(file.getName() + "_" + file.length(), new NativeImageBackedTexture(NativeImage.read(new FileInputStream(file.toPath().normalize().toFile()))));
+                TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+                return textureManager.register(file.getName() + "_" + file.length(), new DynamicTexture(NativeImage.read(new FileInputStream(file.toPath().normalize().toFile()))));
             } catch (IOException e) {
                 SlightGuiModifications.LOGGER.error("Failed to load image at " + file.getAbsolutePath(), e);
-                return new Identifier("missingno");
+                return new ResourceLocation("missingno");
             }
         }
     }

@@ -3,7 +3,7 @@ package me.shedaniel.slightguimodifications.gui.cts;
 import groovy.lang.GroovyShell;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
-import net.minecraft.util.Lazy;
+import net.minecraft.util.LazyLoadedValue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public class CtsRegistry {
     public static final Logger LOGGER = LogManager.getLogger("CtsRegistry");
     
-    private static final Lazy<GroovyShell> SHELL = new Lazy<>(() -> new GroovyShell(FabricLauncherBase.getLauncher().getTargetClassLoader()));
+    private static final LazyLoadedValue<GroovyShell> SHELL = new LazyLoadedValue<>(() -> new GroovyShell(FabricLauncherBase.getLauncher().getTargetClassLoader()));
     
     public static void loadScriptsAsync() {
         CompletableFuture.runAsync(CtsRegistry::loadScripts);

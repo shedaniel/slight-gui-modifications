@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ScissorsHandlerImpl.class)
 public class MixinScissorsHandlerImpl {
     @Inject(method = "applyScissors",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getInstance()Lnet/minecraft/client/MinecraftClient;"),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getInstance()Lnet/minecraft/client/Minecraft;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void applyScissorsOffset(CallbackInfo ci, Rectangle rectangle) {rectangle.translate(0, SlightGuiModifications.applyYAnimation(0));}
+    private void applyScissorsOffset(CallbackInfo ci, Rectangle rectangle) {
+        rectangle.translate(0, SlightGuiModifications.applyYAnimation(0));
+    }
 }

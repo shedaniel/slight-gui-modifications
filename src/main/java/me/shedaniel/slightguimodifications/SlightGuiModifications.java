@@ -2,6 +2,7 @@ package me.shedaniel.slightguimodifications;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.swordglowsblue.artifice.api.Artifice;
 import com.swordglowsblue.artifice.api.resource.ArtificeResource;
@@ -22,23 +23,22 @@ import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.VideoOptionsScreen;
-import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
-import net.minecraft.client.gui.screen.options.SoundOptionsScreen;
-import net.minecraft.client.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Lazy;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.SoundOptionsScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.VideoSettingsScreen;
+import net.minecraft.client.gui.screens.controls.ControlsScreen;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.LazyLoadedValue;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,18 +55,18 @@ import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
 
 public class SlightGuiModifications implements ClientModInitializer {
     public static float backgroundTint = 0;
-    public static final Identifier TEXT_FIELD_TEXTURE = new Identifier("textures/gui/text_field.png");
+    public static final ResourceLocation TEXT_FIELD_TEXTURE = new ResourceLocation("textures/gui/text_field.png");
     public static float lastAlpha = -1;
     public static boolean prettyScreenshots = false;
-    public static NativeImageBackedTexture prettyScreenshotTexture = null;
-    public static NativeImageBackedTexture lastPrettyScreenshotTexture = null;
-    public static Identifier prettyScreenshotTextureId = null;
-    public static Identifier lastPrettyScreenshotTextureId = null;
+    public static DynamicTexture prettyScreenshotTexture = null;
+    public static DynamicTexture lastPrettyScreenshotTexture = null;
+    public static ResourceLocation prettyScreenshotTextureId = null;
+    public static ResourceLocation lastPrettyScreenshotTextureId = null;
     public static long prettyScreenshotTime = -1;
     public static long backgroundTime = -1;
     public static final Logger LOGGER = LogManager.getLogger("SlightGuiModifications");
     
-    private static final Lazy<Object> COLOR_OBJ = new Lazy<>(() -> {
+    private static final LazyLoadedValue<Object> COLOR_OBJ = new LazyLoadedValue<>(() -> {
         try {
             Field field = GlStateManager.class.getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493", "field_20487", "Lnet/minecraft/class_4493$class_1020;"));
             field.setAccessible(true);
@@ -75,7 +75,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             throw new RuntimeException(e);
         }
     });
-    private static final Lazy<Field> RED_FIELD = new Lazy<>(() -> {
+    private static final LazyLoadedValue<Field> RED_FIELD = new LazyLoadedValue<>(() -> {
         try {
             Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5057", "F"));
             field.setAccessible(true);
@@ -84,7 +84,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             throw new RuntimeException(e);
         }
     });
-    private static final Lazy<Field> GREEN_FIELD = new Lazy<>(() -> {
+    private static final LazyLoadedValue<Field> GREEN_FIELD = new LazyLoadedValue<>(() -> {
         try {
             Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5056", "F"));
             field.setAccessible(true);
@@ -93,7 +93,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             throw new RuntimeException(e);
         }
     });
-    private static final Lazy<Field> BLUE_FIELD = new Lazy<>(() -> {
+    private static final LazyLoadedValue<Field> BLUE_FIELD = new LazyLoadedValue<>(() -> {
         try {
             Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5055", "F"));
             field.setAccessible(true);
@@ -102,7 +102,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             throw new RuntimeException(e);
         }
     });
-    private static final Lazy<Field> ALPHA_FIELD = new Lazy<>(() -> {
+    private static final LazyLoadedValue<Field> ALPHA_FIELD = new LazyLoadedValue<>(() -> {
         try {
             Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5054", "F"));
             field.setAccessible(true);
@@ -155,7 +155,7 @@ public class SlightGuiModifications implements ClientModInitializer {
         float colorGreen = getColorGreen(colorObj);
         float colorBlue = getColorBlue(colorObj);
         float colorAlpha = getColorAlpha(colorObj);
-        lastAlpha = colorAlpha == -1 ? 1 : MathHelper.clamp(colorAlpha, 0, 1);
+        lastAlpha = colorAlpha == -1 ? 1 : Mth.clamp(colorAlpha, 0, 1);
         RenderSystem.color4f(colorRed == -1 ? 1 : colorRed,
                 colorGreen == -1 ? 1 : colorGreen,
                 colorBlue == -1 ? 1 : colorBlue,
@@ -185,7 +185,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     public static int applyYAnimation(int y) {
         if (!RenderSystem.isOnRenderThread()) return y;
-        Screen screen = MinecraftClient.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedYOffset();
             if (alpha >= 0) return y + (int) ((1 - alpha) * screen.height / 2);
@@ -194,7 +194,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     }
     
     public static int applyMouseYAnimation(int y) {
-        Screen screen = MinecraftClient.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedMouseY();
             if (alpha >= 0) return y - (int) ((1 - alpha) * screen.height / 2);
@@ -206,7 +206,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     public static double applyYAnimation(double y) {
         if (!RenderSystem.isOnRenderThread()) return y;
-        Screen screen = MinecraftClient.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
         if (screen instanceof AnimationListener) {
             float alpha = ((AnimationListener) screen).slightguimodifications_getEasedYOffset();
             if (alpha >= 0) return y + (int) ((1 - alpha) * screen.height / 2);
@@ -215,7 +215,7 @@ public class SlightGuiModifications implements ClientModInitializer {
     }
     
     public static int applyAlphaAnimation(int alpha) {
-        Screen screen = MinecraftClient.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
         if (screen instanceof AnimationListener) {
             float animatedAlpha = ((AnimationListener) screen).slightguimodifications_getAlpha();
             if (animatedAlpha >= 0) return (int) (animatedAlpha * alpha);
@@ -232,8 +232,8 @@ public class SlightGuiModifications implements ClientModInitializer {
         prettyScreenshotTextureId = null;
         prettyScreenshotTime = -1;
         if (cloneImage != null) {
-            prettyScreenshotTexture = new NativeImageBackedTexture(cloneImage);
-            prettyScreenshotTextureId = MinecraftClient.getInstance().getTextureManager().registerDynamicTexture("slight-gui-modifications-pretty-screenshots", prettyScreenshotTexture);
+            prettyScreenshotTexture = new DynamicTexture(cloneImage);
+            prettyScreenshotTextureId = Minecraft.getInstance().getTextureManager().register("slight-gui-modifications-pretty-screenshots", prettyScreenshotTexture);
         }
     }
     
@@ -242,13 +242,13 @@ public class SlightGuiModifications implements ClientModInitializer {
         AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
         AutoConfig.getGuiRegistry(SlightGuiModificationsConfig.class).registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
-                        ConfigEntryBuilder.create().startIntSlider(new TranslatableText(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
-                                (MinecraftClient.getInstance().getWindow().calculateScaleFactor(0, false) + 4) * 100)
+                        ConfigEntryBuilder.create().startIntSlider(new TranslatableComponent(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
+                                (Minecraft.getInstance().getWindow().calculateScale(0, false) + 4) * 100)
                                 .setDefaultValue(0)
                                 .setTextGetter(integer -> {
                                     if (integer <= 100)
-                                        return new TranslatableText(i13n + ".text.disabled");
-                                    return new TranslatableText(i13n + ".text", integer / 100.0);
+                                        return new TranslatableComponent(i13n + ".text.disabled");
+                                    return new TranslatableComponent(i13n + ".text", integer / 100.0);
                                 })
                                 .setSaveConsumer(integer -> setUnsafely(field, config, integer / 100.0))
                                 .build()
@@ -260,39 +260,39 @@ public class SlightGuiModifications implements ClientModInitializer {
                 if (!((MenuWidgetListener) screen).getMenu().mouseClicked(mouseX, mouseY, mouseButton)) {
                     ((MenuWidgetListener) screen).removeMenu();
                 }
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             if (SlightGuiModifications.getGuiConfig().rightClickActions && mouseButton == 1) {
                 // Pause Menu
-                if (screen instanceof GameMenuScreen || screen instanceof TitleScreen) {
-                    Optional<AbstractButtonWidget> optionsButton = screen.buttons.stream().filter(button -> button != null && button.getMessage().getString().equals(I18n.translate("menu.options"))).findFirst();
+                if (screen instanceof PauseScreen || screen instanceof TitleScreen) {
+                    Optional<AbstractWidget> optionsButton = screen.buttons.stream().filter(button -> button != null && button.getMessage().getString().equals(I18n.get("menu.options"))).findFirst();
                     if (optionsButton.isPresent() && optionsButton.get().isMouseOver(mouseX, mouseY)) {
                         ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
                                 ImmutableList.of(
-                                        new TextMenuEntry(I18n.translate("options.video").replace("...", ""), () -> {
+                                        new TextMenuEntry(I18n.get("options.video").replace("...", ""), () -> {
                                             ((MenuWidgetListener) screen).removeMenu();
-                                            client.openScreen(new VideoOptionsScreen(screen, client.options));
+                                            client.setScreen(new VideoSettingsScreen(screen, client.options));
                                         }),
-                                        new TextMenuEntry(I18n.translate("options.controls").replace("...", ""), () -> {
+                                        new TextMenuEntry(I18n.get("options.controls").replace("...", ""), () -> {
                                             ((MenuWidgetListener) screen).removeMenu();
-                                            client.openScreen(new ControlsOptionsScreen(screen, client.options));
+                                            client.setScreen(new ControlsScreen(screen, client.options));
                                         }),
-                                        new TextMenuEntry(I18n.translate("options.sounds").replace("...", ""), () -> {
+                                        new TextMenuEntry(I18n.get("options.sounds").replace("...", ""), () -> {
                                             ((MenuWidgetListener) screen).removeMenu();
-                                            client.openScreen(new SoundOptionsScreen(screen, client.options));
+                                            client.setScreen(new SoundOptionsScreen(screen, client.options));
                                         })
                                 )
                         ));
                     }
                 }
             }
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
         reloadCtsAsync();
-        Artifice.registerAssets(new Identifier("slightguimodifications:cts_textures"), builder -> {
+        Artifice.registerAssets(new ResourceLocation("slightguimodifications:cts_textures"), builder -> {
             File buttons = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/buttons.png");
             if (buttons.exists()) {
-                builder.add(new Identifier("minecraft:textures/gui/widgets.png"), new ArtificeResource<FileInputStream>() {
+                builder.add(new ResourceLocation("minecraft:textures/gui/widgets.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
                         return null;
@@ -315,7 +315,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             File textField = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/text_field.png");
             if (textField.exists()) {
-                builder.add(new Identifier("minecraft:textures/gui/text_field.png"), new ArtificeResource<FileInputStream>() {
+                builder.add(new ResourceLocation("minecraft:textures/gui/text_field.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
                         return null;
@@ -338,7 +338,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             File slider = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider.png");
             if (slider.exists()) {
-                builder.add(new Identifier("slightguimodifications:textures/gui/slider.png"), new ArtificeResource<FileInputStream>() {
+                builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
                         return null;
@@ -361,7 +361,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             File sliderHovered = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider_hovered.png");
             if (sliderHovered.exists()) {
-                builder.add(new Identifier("slightguimodifications:textures/gui/slider_hovered.png"), new ArtificeResource<FileInputStream>() {
+                builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider_hovered.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
                         return null;
@@ -449,10 +449,10 @@ public class SlightGuiModifications implements ClientModInitializer {
             Runnable runnable = builder.getSavingRunnable();
             builder.setSavingRunnable(() -> {
                 runnable.run();
-                MinecraftClient.getInstance().onResolutionChanged();
+                Minecraft.getInstance().resizeDisplay();
             });
             builder.setAfterInitConsumer(screen -> {
-                ((ScreenHooks) screen).cloth$addButtonWidget(new ButtonWidget(screen.width - 104, 4, 100, 20, new TranslatableText("text.slightguimodifications.reloadCts"), button -> {
+                ((ScreenHooks) screen).cloth$addButtonWidget(new Button(screen.width - 104, 4, 100, 20, new TranslatableComponent("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.resetCts();
                     SlightGuiModifications.reloadCts();
                 }));
