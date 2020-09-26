@@ -34,7 +34,7 @@
   "text.autoconfig.slightguimodifications.option.gui.textFieldModifications.selectionMode.highlight": "Highlight",
   "text.autoconfig.slightguimodifications.option.gui.textFieldModifications.rightClickActions": "Right Click Actions:",
   "text.autoconfig.slightguimodifications.option.gui.textFieldModifications.rightClickActions.@Tooltip": "Whether Text Fields should allow right click actions.",
-  "text.autoconfig.slightguimodifications.option.gui.sliderModifications": "Slider Modifications:",
+  "text.autoconfig.slightguimodifications.option.gui.sliderModifications": "Slider Modifications",
   "text.autoconfig.slightguimodifications.option.gui.sliderModifications.enabled": "Enabled:",
   "text.autoconfig.slightguimodifications.option.gui.sliderModifications.grabberWidth": "Grabber Width:",
   "text.autoconfig.slightguimodifications.option.gui.sliderModifications.customBackgroundTexture": "Custom Texture Enabled:",
