@@ -54,6 +54,8 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         public CustomScaling customScaling = new CustomScaling();
         @ConfigEntry.Gui.CollapsibleObject
         public SlotHighlight slotHighlight = new SlotHighlight();
+        @ConfigEntry.Gui.CollapsibleObject
+        public TooltipModifications tooltipModifications = new TooltipModifications();
         @Comment("Whether GUI should allow right click actions.")
         @ConfigEntry.Gui.Tooltip()
         public boolean rightClickActions = false;
@@ -134,6 +136,17 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
             public boolean enabled = false;
             @ConfigEntry.ColorPicker(allowAlpha = true)
             public int color = 0x80ffffff;
+        }
+        
+        public static class TooltipModifications {
+            @Comment("Whether this module is enabled.")
+            public boolean enabled = false;
+            @ConfigEntry.ColorPicker(allowAlpha = true)
+            public int backgroundColor = 0xf0100010;
+            @ConfigEntry.ColorPicker(allowAlpha = true)
+            public int outlineGradientTopColor = 0x505000ff;
+            @ConfigEntry.ColorPicker(allowAlpha = true)
+            public int outlineGradientBottomColor = 0x5028007f;
         }
         
         @Retention(RetentionPolicy.RUNTIME)
