@@ -30,6 +30,7 @@ repositories {
         }
     }
     maven { url "https://dl.bintray.com/shedaniel/shedaniel-mods" }
+    maven { url "https://dl.bintray.com/shedaniel/cloth" }
     mavenCentral()
 }
 
@@ -45,6 +46,7 @@ dependencies {
     optionally("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable")
     optionally("me.shedaniel:RoughlyEnoughItems:${project.rei_version}")
     optionally("io.github.prospector:modmenu:${project.modmenu_version}")
+    depend("me.shedaniel:architectury:${project.architectury_version}:fabric")
     depend("me.shedaniel.cloth:config-2:${project.cloth_config}")
     depend("me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_api}")
     depend("me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u}")
@@ -87,11 +89,15 @@ def depend(str) {
 }
 
 def optionally(str) {
-    dependencies.modRuntime(str) {
+    runtime(str)
+    dependencies.modCompileOnly(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
     }
-    dependencies.modCompileOnly(str) {
+}
+
+def runtime(str) {
+    dependencies.modRuntime(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
     }

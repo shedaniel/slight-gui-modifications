@@ -10,10 +10,12 @@ import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
+import me.shedaniel.architectury.event.events.TooltipEvent;
 import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
 import me.shedaniel.cloth.api.client.events.v0.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.LazyResettable;
+import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
@@ -287,6 +289,15 @@ public class SlightGuiModifications implements ClientModInitializer {
                 }
             }
             return InteractionResult.PASS;
+        });
+        TooltipEvent.RENDER_MODIFY_COLOR.register((poseStack, x, y, colorContext) -> {
+            SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
+            SlightGuiModificationsConfig.Gui.TooltipModifications modifications = config.tooltipModifications;
+            if (modifications.enabled) {
+                colorContext.setBackgroundColor(modifications.backgroundColor);
+                colorContext.setOutlineGradientTopColor(modifications.outlineGradientTopColor);
+                colorContext.setOutlineGradientBottomColor(modifications.outlineGradientBottomColor);
+            }
         });
         reloadCtsAsync();
         Artifice.registerAssets(new ResourceLocation("slightguimodifications:cts_textures"), builder -> {

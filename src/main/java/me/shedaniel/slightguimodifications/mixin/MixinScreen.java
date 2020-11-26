@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -196,30 +198,6 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     @Inject(method = "init(Lnet/minecraft/client/Minecraft;II)V", at = @At("HEAD"))
     private void init(Minecraft client, int width, int height, CallbackInfo ci) {
         this.menuWidget = null;
-    }
-    
-    @ModifyConstant(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;II)V", constant = @Constant(intValue = 0xf0100010))
-    private int modifyTooltipBackgroundColor(int original) {
-        SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
-        if (config.tooltipModifications.enabled)
-            return config.tooltipModifications.backgroundColor;
-        return original;
-    }
-    
-    @ModifyConstant(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;II)V", constant = @Constant(intValue = 0x505000ff))
-    private int modifyTooltipOutlineGradientTopColor(int original) {
-        SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
-        if (config.tooltipModifications.enabled)
-            return config.tooltipModifications.outlineGradientTopColor;
-        return original;
-    }
-    
-    @ModifyConstant(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;II)V", constant = @Constant(intValue = 0x5028007f))
-    private int modifyTooltipOutlineGradientBottomColor(int original) {
-        SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
-        if (config.tooltipModifications.enabled)
-            return config.tooltipModifications.outlineGradientBottomColor;
-        return original;
     }
     
     @Override
