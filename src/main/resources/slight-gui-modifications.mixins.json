@@ -5,7 +5,7 @@
   "plugin": "me.shedaniel.slightguimodifications.asm.SlightGuiModificationsMixinPlugin",
   "client": [
     "MixinAbstractContainerScreen", "MixinAbstractSelectionList", "MixinAbstractSliderButton", "MixinBookEditScreen", "MixinChatScreen", "MixinCubeMapRenderer",
-    "MixinCycleOption", "MixinEditBox", "MixinGameRenderer", "MixinGui", "MixinGuiComponent", "MixinInventoryScreen", "MixinItemRenderer",
+    "MixinCycleOption", "MixinEditBox", "MixinGameRenderer", "MixinGui", "MixinGuiComponent", "MixinInventoryScreen",
     "MixinKeyboardHandler", "MixinMinecraft", "MixinOptionsScreen", "MixinScreen", "MixinScreenshot", "MixinServerSelectionList$OnlineServerEntry",
     "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance", "MixinWorldSelectionList$WorldListEntry",
     "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen", "rei.MixinOverlaySearchField",
