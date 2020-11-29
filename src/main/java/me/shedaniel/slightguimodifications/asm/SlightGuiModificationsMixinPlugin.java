@@ -19,6 +19,10 @@ public class SlightGuiModificationsMixinPlugin implements IMixinConfigPlugin {
             .put("MixinModsScreen", new String[]{"modmenu"})
             .put("MixinModListWidget", new String[]{"modmenu"})
             .build();
+
+    private static final ImmutableMap<String, String[]> MIXIN_INCOMPATIBLE_MODS = ImmutableMap.<String, String[]>builder()
+            .put("MixinRenderItemChangeY", new String[]{"canvas"})
+            .build();
     
     @Override
     public void onLoad(String mixinPackage) {}
@@ -29,9 +33,14 @@ public class SlightGuiModificationsMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         String className = mixinClassName.substring(mixinClassName.lastIndexOf('.') + 1);
-        String[] mods = MIXIN_REQUIRES_MODS.get(className);
-        if (mods == null) return true;
-        for (String mod : mods) if (!FabricLoader.getInstance().isModLoaded(mod)) return false;
+        String[] requiredMods = MIXIN_REQUIRES_MODS.get(className);
+        String[] incompatibleMods = MIXIN_INCOMPATIBLE_MODS.get(className);
+        if(requiredMods != null) {
+            for (String mod : requiredMods) if (!FabricLoader.getInstance().isModLoaded(mod)) return false;
+        }
+        if(incompatibleMods != null) {
+            for (String mod : incompatibleMods) if (FabricLoader.getInstance().isModLoaded(mod)) return false;
+        }
         return true;
     }
     
