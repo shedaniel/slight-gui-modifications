@@ -23,8 +23,7 @@
   },
   "accessWidener": "slight-gui-modifications.aw",
   "mixins": [
-    "slight-gui-modifications.mixins.json",
-    "slight-gui-modifications-item-renderer.mixins.json"
+    "slight-gui-modifications.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.8.2",
