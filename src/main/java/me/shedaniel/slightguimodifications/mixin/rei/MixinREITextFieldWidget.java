@@ -109,7 +109,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 0),
-               index = 4)
+               index = 5)
     private int modifyBorderHighlightedColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
@@ -117,7 +117,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 1),
-               index = 4)
+               index = 5)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
@@ -125,7 +125,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 2),
-               index = 4)
+               index = 5)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }

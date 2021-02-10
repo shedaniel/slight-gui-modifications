@@ -70,7 +70,7 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/OverlaySearchField;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V", ordinal = 2),
-               index = 4)
+               index = 5)
     private int modifyBackgroundColor(int color) {return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;}
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
