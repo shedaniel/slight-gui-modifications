@@ -3,7 +3,7 @@ package me.shedaniel.slightguimodifications.mixin.modmenu;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.prospector.modmenu.gui.ModListWidget;
+import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import net.minecraft.client.Minecraft;

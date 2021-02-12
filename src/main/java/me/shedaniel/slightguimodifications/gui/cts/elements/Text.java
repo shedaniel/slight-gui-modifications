@@ -57,7 +57,7 @@ public final class Text {
         }).toArray()));
     }
     
-    private static Text wrap(MutableComponent text) {
+    public static Text wrap(MutableComponent text) {
         return new Text(text);
     }
     

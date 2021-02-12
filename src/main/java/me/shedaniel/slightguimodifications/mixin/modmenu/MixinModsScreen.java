@@ -2,7 +2,7 @@ package me.shedaniel.slightguimodifications.mixin.modmenu;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.prospector.modmenu.gui.ModsScreen;
+import com.terraformersmc.modmenu.gui.ModsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.opengl.GL11;

@@ -6,16 +6,15 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.swordglowsblue.artifice.api.Artifice;
 import com.swordglowsblue.artifice.api.resource.ArtificeResource;
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import me.shedaniel.architectury.event.events.TooltipEvent;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.gui.ConfigScreenProvider;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
 import me.shedaniel.cloth.api.client.events.v0.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.LazyResettable;
-import me.shedaniel.clothconfig2.api.Tooltip;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
@@ -52,8 +51,8 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Optional;
 
-import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.getUnsafely;
-import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
+import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
+import static me.shedaniel.autoconfig.util.Utils.setUnsafely;
 
 public class SlightGuiModifications implements ClientModInitializer {
     public static float backgroundTint = 0;
@@ -416,9 +415,9 @@ public class SlightGuiModifications implements ClientModInitializer {
         }
     }
     
-    public static String getModMenuModsCount() {
+    public static String getModMenuText() {
         try {
-            return (String) Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("getDisplayedModCount").invoke(null);
+            return (String) Class.forName("me.shedaniel.slightguimodifications.gui.cts.ModMenuCompat").getDeclaredMethod("getModMenuText").invoke(null);
         } catch (Exception e) {
             e.printStackTrace();
             return e.getMessage();

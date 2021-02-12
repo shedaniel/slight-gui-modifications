@@ -5,8 +5,6 @@ import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.Position;
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
-import me.shedaniel.slightguimodifications.gui.cts.script.Middleman.FileTextureProvider;
-import me.shedaniel.slightguimodifications.gui.cts.script.Middleman.ResourceTextureProvider;
 import me.shedaniel.slightguimodifications.gui.cts.widgets.CustomizedButtonWidget;
 import me.shedaniel.slightguimodifications.gui.cts.widgets.LabelWidget;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,7 +33,7 @@ import java.nio.file.NoSuchFileException;
 
 public class Middleman {
     public static Text modMenuText() {
-        return Text.translatable("modmenu.title").append(" ").append(Text.translatable("modmenu.loaded", SlightGuiModifications.getModMenuModsCount()));
+        return Text.literal(SlightGuiModifications.getModMenuText());
     }
     
     public static void url(String string) {

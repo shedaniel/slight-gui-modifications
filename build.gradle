@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.5-SNAPSHOT'
+    id 'forgified-fabric-loom' version '0.6.66'
     id 'maven-publish'
 }
 
@@ -30,6 +30,12 @@ repositories {
         }
     }
     maven { url "https://maven.shedaniel.me" }
+    maven { url "https://maven.terraformersmc.com/releases" }
+    jcenter {
+        content {
+            includeGroup "com.lettuce.fudge"
+        }
+    }
     mavenCentral()
 }
 
@@ -44,13 +50,12 @@ dependencies {
     depend("com.github.Chocohead:Fabric-ASM:${project.fabric_asm_version}")
     optionally("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable")
     optionally("me.shedaniel:RoughlyEnoughItems:${project.rei_version}")
-    optionally("io.github.prospector:modmenu:${project.modmenu_version}")
+    optionally("com.terraformersmc:modmenu:${project.modmenu_version}")
     depend("me.shedaniel:architectury:${project.architectury_version}:fabric")
-    depend("me.shedaniel.cloth:config-2:${project.cloth_config}")
+    depend("me.shedaniel.cloth:cloth-config:${project.cloth_config}:fabric")
     depend("me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_api}")
-    depend("me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u}")
-    modApi("com.lettuce.fudge:artifice:${project.artifice_version}")
-    modApi("org.codehaus.groovy:groovy-jsr223:3.0.3")
+    depend("com.lettuce.fudge:artifice:${project.artifice_version}")
+    depend("org.codehaus.groovy:groovy-jsr223:3.0.3")
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     afterEvaluate {
@@ -84,6 +89,7 @@ def depend(str) {
     dependencies.modApi(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
+        exclude(module: "config-2")
     }
 }
 
@@ -92,6 +98,8 @@ def optionally(str) {
     dependencies.modCompileOnly(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "io.github.prospector")
+        exclude(module: "config-2")
     }
 }
 
@@ -99,6 +107,8 @@ def runtime(str) {
     dependencies.modRuntime(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "io.github.prospector")
+        exclude(module: "config-2")
     }
 }
 
