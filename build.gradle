@@ -51,44 +51,26 @@ dependencies {
     optionally("me.shedaniel:SmoothScrollingEverywhere:3.0.3-unstable")
     optionally("me.shedaniel:RoughlyEnoughItems:${project.rei_version}")
     optionally("com.terraformersmc:modmenu:${project.modmenu_version}")
-    depend("me.shedaniel:architectury:${project.architectury_version}:fabric")
-    depend("me.shedaniel.cloth:cloth-config:${project.cloth_config}:fabric")
+    optionally("me.shedaniel:architectury:${project.architectury_version}:fabric")
+    optionally("me.shedaniel.cloth:cloth-config:${project.cloth_config}:fabric")
     depend("me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_api}")
     depend("com.lettuce.fudge:artifice:${project.artifice_version}")
     depend("org.codehaus.groovy:groovy-jsr223:3.0.3")
+    depend("org.codehaus.groovy:groovy:3.0.3")
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-
-    afterEvaluate {
-        def listAdded = []
-        def eachDep = null
-        eachDep = { dep ->
-            for (apiIncludeDepStr in (api_include as String).split(',')) {
-                def apiIncludeGroup = apiIncludeDepStr.split(':')[0]
-                def apiIncludeDep = apiIncludeDepStr.split(':')[1]
-                if (dep.module.id.group == apiIncludeGroup && dep.module.id.name.startsWith(apiIncludeDep)) {
-                    def version = dep.module.id.version.indexOf('@') >= 0 ? dep.module.id.version.substring(0, dep.module.id.version.indexOf('@')) : dep.module.id.version
-                    def mavenDep = "${dep.module.id.group}:${dep.module.id.name}:$version"
-                    if (!(mavenDep in listAdded)) {
-                        include(mavenDep) {
-                            transitive = false
-                        }
-                        listAdded.add(mavenDep)
-                    }
-                    break
-                }
-            }
-            dep.children.each eachDep
-        }
-
-        configurations.compile.resolvedConfiguration.firstLevelModuleDependencies.each eachDep
-        configurations.runtimeClasspath.resolvedConfiguration.firstLevelModuleDependencies.each eachDep
-    }
 }
 
 def depend(str) {
     dependencies.modApi(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "io.github.prospector")
+        exclude(module: "config-2")
+    }
+    dependencies.include(str) {
+        exclude(group: "net.fabricmc")
+        exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "io.github.prospector")
         exclude(module: "config-2")
     }
 }

@@ -28,6 +28,7 @@
   "depends": {
     "fabricloader": ">=0.8.2",
     "architectury": ">=1.5.112", 
-    "modmenu": ">=1.16.7"
+    "modmenu": ">=1.16.7",
+    "artifice": ">=0.14.6"
   }
 }
