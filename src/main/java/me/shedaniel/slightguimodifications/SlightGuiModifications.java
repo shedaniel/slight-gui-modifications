@@ -43,11 +43,10 @@ import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -299,9 +298,10 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
         });
         reloadCtsAsync();
-        Artifice.registerAssets(new ResourceLocation("slightguimodifications:cts_textures"), builder -> {
-            File buttons = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/buttons.png");
-            if (buttons.exists()) {
+        Artifice.registerAssetPack(new ResourceLocation("slightguimodifications:cts_textures"), builder -> {
+            builder.shouldOverwrite();
+            Path buttons = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/buttons.png");
+            if (Files.exists(buttons)) {
                 builder.add(new ResourceLocation("minecraft:textures/gui/widgets.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
@@ -316,15 +316,15 @@ public class SlightGuiModifications implements ClientModInitializer {
                     @Override
                     public InputStream toInputStream() {
                         try {
-                            return new FileInputStream(buttons);
-                        } catch (FileNotFoundException e) {
+                            return new ByteArrayInputStream(Files.readAllBytes(buttons));
+                        } catch (IOException e) {
                             return null;
                         }
                     }
                 });
             }
-            File textField = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/text_field.png");
-            if (textField.exists()) {
+            Path textField = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/text_field.png");
+            if (Files.exists(textField)) {
                 builder.add(new ResourceLocation("minecraft:textures/gui/text_field.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
@@ -339,15 +339,15 @@ public class SlightGuiModifications implements ClientModInitializer {
                     @Override
                     public InputStream toInputStream() {
                         try {
-                            return new FileInputStream(textField);
-                        } catch (FileNotFoundException e) {
+                            return new ByteArrayInputStream(Files.readAllBytes(textField));
+                        } catch (IOException e) {
                             return null;
                         }
                     }
                 });
             }
-            File slider = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider.png");
-            if (slider.exists()) {
+            Path slider = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/slider.png");
+            if (Files.exists(slider)) {
                 builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
@@ -362,15 +362,15 @@ public class SlightGuiModifications implements ClientModInitializer {
                     @Override
                     public InputStream toInputStream() {
                         try {
-                            return new FileInputStream(slider);
-                        } catch (FileNotFoundException e) {
+                            return new ByteArrayInputStream(Files.readAllBytes(slider));
+                        } catch (IOException e) {
                             return null;
                         }
                     }
                 });
             }
-            File sliderHovered = new File(FabricLoader.getInstance().getConfigDirectory(), "slightguimodifications/slider_hovered.png");
-            if (sliderHovered.exists()) {
+            Path sliderHovered = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/slider_hovered.png");
+            if (Files.exists(sliderHovered)) {
                 builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider_hovered.png"), new ArtificeResource<FileInputStream>() {
                     @Override
                     public FileInputStream getData() {
@@ -385,8 +385,8 @@ public class SlightGuiModifications implements ClientModInitializer {
                     @Override
                     public InputStream toInputStream() {
                         try {
-                            return new FileInputStream(sliderHovered);
-                        } catch (FileNotFoundException e) {
+                            return new ByteArrayInputStream(Files.readAllBytes(sliderHovered));
+                        } catch (IOException e) {
                             return null;
                         }
                     }
