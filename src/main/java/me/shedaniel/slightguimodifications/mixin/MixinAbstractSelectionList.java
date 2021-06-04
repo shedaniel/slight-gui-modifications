@@ -30,18 +30,18 @@ public class MixinAbstractSelectionList {
 //    }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(ILcom/mojang/blaze3d/vertex/VertexFormat;)V"))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V"))
     private void preBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        RenderSystem.pushMatrix();
+//        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
-        RenderSystem.disableAlphaTest();
+//        RenderSystem.disableAlphaTest();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
     }
     
     @Inject(method = "render",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
     private void postBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        RenderSystem.popMatrix();
+//        RenderSystem.popMatrix();
     }
 }

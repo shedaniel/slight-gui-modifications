@@ -16,19 +16,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("rawtypes")
 @Mixin(ModListWidget.class)
-public class MixinModListWidget extends AbstractSelectionList {
+public abstract class MixinModListWidget extends AbstractSelectionList {
     public MixinModListWidget(Minecraft client, int width, int height, int top, int bottom, int itemHeight) {
         super(client, width, height, top, bottom, itemHeight);
     }
     
     @Inject(method = "renderList",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(ILcom/mojang/blaze3d/vertex/VertexFormat;)V"))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V"))
     private void preSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        RenderSystem.pushMatrix();
+//        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
-        RenderSystem.disableAlphaTest();
+//        RenderSystem.disableAlphaTest();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
         float alpha = ((AnimationListener) minecraft.screen).slightguimodifications_getAlpha();
         if (alpha >= 0) {
             SlightGuiModifications.setAlpha(alpha);
@@ -38,7 +38,7 @@ public class MixinModListWidget extends AbstractSelectionList {
     @Inject(method = "renderList",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
     private void postSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        RenderSystem.popMatrix();
+//        RenderSystem.popMatrix();
         SlightGuiModifications.restoreAlpha();
     }
 }

@@ -2,10 +2,7 @@ package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
@@ -20,6 +17,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -100,8 +98,8 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
     
     @Unique
     private void renderTextureBorder() {
-        Minecraft.getInstance().getTextureManager().bind(SlightGuiModifications.TEXT_FIELD_TEXTURE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, SlightGuiModifications.TEXT_FIELD_TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
         RenderSystem.blendFunc(770, 771);
@@ -125,19 +123,23 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
         this.lastMatrices = null;
     }
     
-    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V", ordinal = 0),
+    @ModifyArg(method = "renderButton",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+                        ordinal = 0),
                index = 5)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
-    @ModifyArg(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V", ordinal = 1),
+    @ModifyArg(method = "renderButton",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+                        ordinal = 1),
                index = 5)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     
-    @Inject(method = "renderHighlight", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;color4f(FFFF)V", ordinal = 0),
+    @Inject(method = "renderHighlight", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", remap = false, ordinal = 0),
             cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void drawSelectionHighlight(int x1, int y1, int x2, int y2, CallbackInfo ci, Tesselator tessellator, BufferBuilder buffer) {
         if (!SlightGuiModifications.getGuiConfig().textFieldModifications.enabled || SlightGuiModifications.getGuiConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.Gui.TextFieldModifications.SelectionMode.HIGHLIGHT)
@@ -170,18 +172,19 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
         int b = (color & 255);
         RenderSystem.disableTexture();
         RenderSystem.enableBlend();
-        RenderSystem.disableAlphaTest();
+//        RenderSystem.disableAlphaTest();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderSystem.shadeModel(7425);
-        buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+//        RenderSystem.shadeModel(7425);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         buffer.vertex(x1, y2, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
         buffer.vertex(x2, y2, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
         buffer.vertex(x2, y1, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
         buffer.vertex(x1, y1, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
         tessellator.end();
-        RenderSystem.shadeModel(7424);
+//        RenderSystem.shadeModel(7424);
         RenderSystem.disableBlend();
-        RenderSystem.enableAlphaTest();
+//        RenderSystem.enableAlphaTest();
         RenderSystem.enableTexture();
     }
     

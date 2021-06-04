@@ -3,8 +3,10 @@ package me.shedaniel.slightguimodifications.mixin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import net.minecraft.client.Minecraft;
@@ -69,7 +71,7 @@ public class MixinGui extends GuiComponent {
             double nonBeneficialOffset = 0;
             MobEffectTextureManager statusEffectSpriteManager = this.minecraft.getMobEffectTextures();
             List<Runnable> list = Lists.newArrayListWithExpectedSize(collection.size());
-            this.minecraft.getTextureManager().bind(AbstractContainerScreen.INVENTORY_LOCATION);
+            RenderSystem.setShaderTexture(0, AbstractContainerScreen.INVENTORY_LOCATION);
             
             for (MobEffectInstance statusEffectInstance : Ordering.natural().reverse().sortedCopy(collection)) {
                 MobEffect statusEffect = statusEffectInstance.getEffect();
@@ -91,7 +93,7 @@ public class MixinGui extends GuiComponent {
                     
                     matrices.pushPose();
                     float alphaOffset = (float) Math.min(1.0, 1 - EasingMethod.EasingMethodImpl.LINEAR.apply(1 - Mth.clamp(statusEffectInstance.getDuration() / 10.0, 0, 1)));
-                    RenderSystem.color4f(1.0F, 1.0F, 1.0F, alphaOffset);
+                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alphaOffset);
                     matrices.translate(x[0] - this.screenWidth, 0, 0);
                     float[] alpha = {alphaOffset};
                     if (statusEffectInstance.isAmbient()) {
@@ -108,9 +110,9 @@ public class MixinGui extends GuiComponent {
                     TextureAtlasSprite sprite = statusEffectSpriteManager.get(statusEffect);
                     list.add(() -> {
                         if (alpha[0] <= 0.01) return;
-                        this.minecraft.getTextureManager().bind(sprite.atlas().location());
+                        RenderSystem.setShaderTexture(0, sprite.atlas().location());
                         matrices.pushPose();
-                        RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha[0]);
+                        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha[0]);
                         matrices.translate(x[0] - this.screenWidth, 0, 0);
                         blit(matrices, this.screenWidth + 3, y[0] + 3, this.getBlitOffset(), 18, 18, sprite);
                         matrices.popPose();
@@ -121,12 +123,13 @@ public class MixinGui extends GuiComponent {
             list.forEach(Runnable::run);
             
             RenderSystem.clear(256, Minecraft.ON_OSX);
-            RenderSystem.matrixMode(5889);
-            RenderSystem.loadIdentity();
-            RenderSystem.ortho(0.0D, minecraft.getWindow().getWidth() / minecraft.getWindow().getGuiScale(), minecraft.getWindow().getHeight() / minecraft.getWindow().getGuiScale(), 0.0D, 1000.0D, 3000.0D);
-            RenderSystem.matrixMode(5888);
-            RenderSystem.loadIdentity();
-            RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+            Window window = minecraft.getWindow();
+            Matrix4f matrix4f = Matrix4f.orthographic(0.0F, (float) (window.getWidth() / window.getGuiScale()), 0.0F, (float) (window.getHeight() / window.getGuiScale()), 1000.0F, 3000.0F);
+            RenderSystem.setProjectionMatrix(matrix4f);
+            PoseStack poseStack = RenderSystem.getModelViewStack();
+            poseStack.setIdentity();
+            poseStack.translate(0.0D, 0.0D, -2000.0D);
+            RenderSystem.applyModelViewMatrix();
             Lighting.setupFor3DItems();
         }
     }

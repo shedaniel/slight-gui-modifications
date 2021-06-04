@@ -8,19 +8,19 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(AbstractContainerScreen.class)
 public class MixinAbstractContainerScreen {
-    @ModifyArg(method = "render", index = 5,
+    @ModifyArg(method = "renderSlotHighlight", index = 5,
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V",
+                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIIII)V",
                         ordinal = 0))
-    private int renderSlotHighlight1(int color) {
+    private static int renderSlotHighlight1(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;
     }
     
-    @ModifyArg(method = "render", index = 6,
+    @ModifyArg(method = "renderSlotHighlight", index = 6,
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V",
+                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIIII)V",
                         ordinal = 0))
-    private int renderSlotHighlight2(int color) {
+    private static int renderSlotHighlight2(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;
     }
 }

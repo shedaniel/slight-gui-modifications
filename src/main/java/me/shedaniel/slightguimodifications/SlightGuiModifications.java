@@ -1,18 +1,15 @@
 package me.shedaniel.slightguimodifications;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.swordglowsblue.artifice.api.Artifice;
-import com.swordglowsblue.artifice.api.resource.ArtificeResource;
-import me.shedaniel.architectury.event.events.TooltipEvent;
+import dev.architectury.event.events.client.ClientTooltipEvent;
+import dev.architectury.hooks.client.screen.ScreenHooks;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.gui.ConfigScreenProvider;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
-import me.shedaniel.cloth.api.client.events.v0.ScreenHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.LazyResettable;
 import me.shedaniel.math.Point;
@@ -22,29 +19,26 @@ import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
 import me.shedaniel.slightguimodifications.gui.cts.CtsRegistry;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
+import net.devtech.arrp.api.RRPCallback;
+import net.devtech.arrp.api.RuntimeResourcePack;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.SoundOptionsScreen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.VideoSettingsScreen;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.controls.ControlsScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.lang.reflect.Field;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -66,97 +60,35 @@ public class SlightGuiModifications implements ClientModInitializer {
     public static long backgroundTime = -1;
     public static final Logger LOGGER = LogManager.getLogger("SlightGuiModifications");
     
-    private static final LazyLoadedValue<Object> COLOR_OBJ = new LazyLoadedValue<>(() -> {
-        try {
-            Field field = GlStateManager.class.getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493", "field_20487", "Lnet/minecraft/class_4493$class_1020;"));
-            field.setAccessible(true);
-            return field.get(null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    });
-    private static final LazyLoadedValue<Field> RED_FIELD = new LazyLoadedValue<>(() -> {
-        try {
-            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5057", "F"));
-            field.setAccessible(true);
-            return field;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    });
-    private static final LazyLoadedValue<Field> GREEN_FIELD = new LazyLoadedValue<>(() -> {
-        try {
-            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5056", "F"));
-            field.setAccessible(true);
-            return field;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    });
-    private static final LazyLoadedValue<Field> BLUE_FIELD = new LazyLoadedValue<>(() -> {
-        try {
-            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5055", "F"));
-            field.setAccessible(true);
-            return field;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    });
-    private static final LazyLoadedValue<Field> ALPHA_FIELD = new LazyLoadedValue<>(() -> {
-        try {
-            Field field = getColorObj().getClass().getDeclaredField(FabricLoader.getInstance().getMappingResolver().mapFieldName("intermediary", "net.minecraft.class_4493$class_1020", "field_5054", "F"));
-            field.setAccessible(true);
-            return field;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    });
-    
-    public static Object getColorObj() {
-        return COLOR_OBJ.get();
+    public static float[] getColorObj() {
+        return RenderSystem.getShaderColor();
     }
     
-    public static float getColorRed(Object colorObj) {
-        try {
-            return (float) RED_FIELD.get().get(colorObj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static float getColorRed(float[] colorObj) {
+        return colorObj[0];
     }
     
-    public static float getColorGreen(Object colorObj) {
-        try {
-            return (float) GREEN_FIELD.get().get(colorObj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static float getColorGreen(float[] colorObj) {
+        return colorObj[1];
     }
     
-    public static float getColorBlue(Object colorObj) {
-        try {
-            return (float) BLUE_FIELD.get().get(colorObj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static float getColorBlue(float[] colorObj) {
+        return colorObj[2];
     }
     
-    public static float getColorAlpha(Object colorObj) {
-        try {
-            return (float) ALPHA_FIELD.get().get(colorObj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static float getColorAlpha(float[] colorObj) {
+        return colorObj[3];
     }
     
     public static void setAlpha(float alpha) {
         if (lastAlpha >= 0) new IllegalStateException().printStackTrace();
-        Object colorObj = getColorObj();
+        float[] colorObj = getColorObj();
         float colorRed = getColorRed(colorObj);
         float colorGreen = getColorGreen(colorObj);
         float colorBlue = getColorBlue(colorObj);
         float colorAlpha = getColorAlpha(colorObj);
         lastAlpha = colorAlpha == -1 ? 1 : Mth.clamp(colorAlpha, 0, 1);
-        RenderSystem.color4f(colorRed == -1 ? 1 : colorRed,
+        RenderSystem.setShaderColor(colorRed == -1 ? 1 : colorRed,
                 colorGreen == -1 ? 1 : colorGreen,
                 colorBlue == -1 ? 1 : colorBlue,
                 lastAlpha * alpha);
@@ -164,11 +96,11 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     public static void restoreAlpha() {
         if (lastAlpha < 0) return;
-        Object colorObj = getColorObj();
+        float[] colorObj = getColorObj();
         float colorRed = getColorRed(colorObj);
         float colorGreen = getColorGreen(colorObj);
         float colorBlue = getColorBlue(colorObj);
-        RenderSystem.color4f(colorRed == -1 ? 1 : colorRed,
+        RenderSystem.setShaderColor(colorRed == -1 ? 1 : colorRed,
                 colorGreen == -1 ? 1 : colorGreen,
                 colorBlue == -1 ? 1 : colorBlue,
                 lastAlpha);
@@ -265,8 +197,9 @@ public class SlightGuiModifications implements ClientModInitializer {
             if (SlightGuiModifications.getGuiConfig().rightClickActions && mouseButton == 1) {
                 // Pause Menu
                 if (screen instanceof PauseScreen || screen instanceof TitleScreen) {
-                    Optional<AbstractWidget> optionsButton = screen.buttons.stream().filter(button -> button != null && button.getMessage().getString().equals(I18n.get("menu.options"))).findFirst();
-                    if (optionsButton.isPresent() && optionsButton.get().isMouseOver(mouseX, mouseY)) {
+                    Optional<Widget> optionsButton = ScreenHooks.getRenderables(screen).stream()
+                            .filter(button -> button instanceof AbstractWidget widget && widget.getMessage().getString().equals(I18n.get("menu.options"))).findFirst();
+                    if (optionsButton.isPresent() && ((AbstractWidget) optionsButton.get()).isMouseOver(mouseX, mouseY)) {
                         ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
                                 ImmutableList.of(
                                         new TextMenuEntry(I18n.get("options.video").replace("...", ""), () -> {
@@ -288,7 +221,7 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
             return InteractionResult.PASS;
         });
-        TooltipEvent.RENDER_MODIFY_COLOR.register((poseStack, x, y, colorContext) -> {
+        ClientTooltipEvent.RENDER_MODIFY_COLOR.register((poseStack, x, y, colorContext) -> {
             SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
             SlightGuiModificationsConfig.Gui.TooltipModifications modifications = config.tooltipModifications;
             if (modifications.enabled) {
@@ -298,100 +231,41 @@ public class SlightGuiModifications implements ClientModInitializer {
             }
         });
         reloadCtsAsync();
-        Artifice.registerAssetPack(new ResourceLocation("slightguimodifications:cts_textures"), builder -> {
-            builder.shouldOverwrite();
-            Path buttons = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/buttons.png");
+        RRPCallback.AFTER_VANILLA.register(packs -> {
+            RuntimeResourcePack pack = RuntimeResourcePack.create("slightguimodifications:cts_textures");
+            Path buttons = FabricLoader.getInstance().getConfigDir().resolve("slightguimodifications/buttons.png");
             if (Files.exists(buttons)) {
-                builder.add(new ResourceLocation("minecraft:textures/gui/widgets.png"), new ArtificeResource<FileInputStream>() {
-                    @Override
-                    public FileInputStream getData() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public String toOutputString() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public InputStream toInputStream() {
-                        try {
-                            return new ByteArrayInputStream(Files.readAllBytes(buttons));
-                        } catch (IOException e) {
-                            return null;
-                        }
-                    }
-                });
+                try {
+                    pack.addAsset(new ResourceLocation("minecraft:textures/gui/widgets.png"), Files.readAllBytes(buttons));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            Path textField = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/text_field.png");
+            Path textField = FabricLoader.getInstance().getConfigDir().resolve("slightguimodifications/text_field.png");
             if (Files.exists(textField)) {
-                builder.add(new ResourceLocation("minecraft:textures/gui/text_field.png"), new ArtificeResource<FileInputStream>() {
-                    @Override
-                    public FileInputStream getData() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public String toOutputString() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public InputStream toInputStream() {
-                        try {
-                            return new ByteArrayInputStream(Files.readAllBytes(textField));
-                        } catch (IOException e) {
-                            return null;
-                        }
-                    }
-                });
+                try {
+                    pack.addAsset(new ResourceLocation("minecraft:textures/gui/text_field.png"), Files.readAllBytes(textField));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            Path slider = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/slider.png");
+            Path slider = FabricLoader.getInstance().getConfigDir().resolve("slightguimodifications/slider.png");
             if (Files.exists(slider)) {
-                builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider.png"), new ArtificeResource<FileInputStream>() {
-                    @Override
-                    public FileInputStream getData() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public String toOutputString() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public InputStream toInputStream() {
-                        try {
-                            return new ByteArrayInputStream(Files.readAllBytes(slider));
-                        } catch (IOException e) {
-                            return null;
-                        }
-                    }
-                });
+                try {
+                    pack.addAsset(new ResourceLocation("slightguimodifications:textures/gui/slider.png"), Files.readAllBytes(slider));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            Path sliderHovered = FabricLoader.getInstance().getConfigDir().resolve( "slightguimodifications/slider_hovered.png");
+            Path sliderHovered = FabricLoader.getInstance().getConfigDir().resolve("slightguimodifications/slider_hovered.png");
             if (Files.exists(sliderHovered)) {
-                builder.add(new ResourceLocation("slightguimodifications:textures/gui/slider_hovered.png"), new ArtificeResource<FileInputStream>() {
-                    @Override
-                    public FileInputStream getData() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public String toOutputString() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public InputStream toInputStream() {
-                        try {
-                            return new ByteArrayInputStream(Files.readAllBytes(sliderHovered));
-                        } catch (IOException e) {
-                            return null;
-                        }
-                    }
-                });
+                try {
+                    pack.addAsset(new ResourceLocation("slightguimodifications:textures/gui/slider_hovered.png"), Files.readAllBytes(sliderHovered));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            packs.add(pack);
         });
     }
     
@@ -462,7 +336,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 Minecraft.getInstance().resizeDisplay();
             });
             builder.setAfterInitConsumer(screen -> {
-                ((ScreenHooks) screen).cloth$addButtonWidget(new Button(screen.width - 104, 4, 100, 20, new TranslatableComponent("text.slightguimodifications.reloadCts"), button -> {
+                ScreenHooks.addRenderableWidget(screen, new Button(screen.width - 104, 4, 100, 20, new TranslatableComponent("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.resetCts();
                     SlightGuiModifications.reloadCts();
                 }));

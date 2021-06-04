@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.ClothConfigInitializer;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
+import me.shedaniel.clothconfig2.api.ScrollingContainer;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.Minecraft;
@@ -26,10 +27,14 @@ public class MenuWidget extends AbstractContainerEventHandler implements Widget 
         }
         
         @Override
-        public Rectangle getBounds() {return MenuWidget.this.getInnerBounds();}
+        public Rectangle getBounds() {
+            return MenuWidget.this.getInnerBounds();
+        }
         
         @Override
-        public boolean hasScrollBar() {return MenuWidget.this.hasScrollBar();}
+        public boolean hasScrollBar() {
+            return MenuWidget.this.hasScrollBar();
+        }
     };
     
     public MenuWidget(Point menuStartPoint, Collection<MenuEntry> entries) {

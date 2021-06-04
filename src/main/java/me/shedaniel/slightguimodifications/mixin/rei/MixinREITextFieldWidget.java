@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
+import me.shedaniel.clothconfig2.api.TickableWidget;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.gui.OverlaySearchField;
-import me.shedaniel.rei.gui.widget.TextFieldWidget;
-import me.shedaniel.rei.gui.widget.WidgetWithBounds;
+import me.shedaniel.rei.api.client.gui.widgets.WidgetWithBounds;
+import me.shedaniel.rei.impl.client.gui.widget.basewidgets.TextFieldWidget;
+import me.shedaniel.rei.impl.client.gui.widget.search.OverlaySearchField;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuEntry;
@@ -18,7 +19,6 @@ import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(TextFieldWidget.class)
-public abstract class MixinREITextFieldWidget extends WidgetWithBounds implements TickableBlockEntity {
+public abstract class MixinREITextFieldWidget extends WidgetWithBounds implements TickableWidget {
     @Shadow(remap = false)
     public abstract boolean hasBorder();
     
@@ -42,18 +42,18 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     
     @Shadow(remap = false) protected boolean editable;
     
-    @Shadow(remap = false) protected int selectionStart;
+    @Shadow(remap = false) protected int cursorPos;
     
-    @Shadow(remap = false) protected int selectionEnd;
+    @Shadow(remap = false) protected int highlightPos;
     
     @Shadow(remap = false)
     public abstract boolean isFocused();
     
     @Shadow(remap = false)
-    public abstract void setCursorToEnd();
+    public abstract void moveCursorToEnd();
     
     @Shadow(remap = false)
-    public abstract void setSelectionEnd(int int_1);
+    public abstract void setHighlightPos(int int_1);
     
     @Shadow(remap = false)
     public abstract void addText(String string_1);
@@ -81,8 +81,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     
     @Unique
     private void renderTextureBorder(PoseStack matrices) {
-        Minecraft.getInstance().getTextureManager().bind(SlightGuiModifications.TEXT_FIELD_TEXTURE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, SlightGuiModifications.TEXT_FIELD_TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
         RenderSystem.blendFunc(770, 771);
@@ -107,7 +107,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     }
     
     @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 0),
                index = 5)
     private int modifyBorderHighlightedColor(int color) {
@@ -115,7 +115,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     }
     
     @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 1),
                index = 5)
     private int modifyBorderColor(int color) {
@@ -123,7 +123,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     }
     
     @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/widget/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 2),
                index = 5)
     private int modifyBackgroundColor(int color) {
@@ -134,13 +134,13 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (getBounds().contains(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1 && !((Object) this instanceof OverlaySearchField)) {
             if (editable) {
-                if (selectionStart - selectionEnd != 0) {
+                if (cursorPos - highlightPos != 0) {
                     ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createSelectingMenu()));
                 } else {
                     ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createNonSelectingMenu()));
                 }
             } else {
-                if (selectionStart - selectionEnd != 0) {
+                if (cursorPos - highlightPos != 0) {
                     ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createSelectingNotEditableMenu()));
                 } else {
                     ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createNonSelectingNotEditableMenu()));
@@ -163,8 +163,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     private List<MenuEntry> createNonSelectingNotEditableMenu() {
         return ImmutableList.of(
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.setCursorToEnd();
-                    this.setSelectionEnd(0);
+                    this.moveCursorToEnd();
+                    this.setHighlightPos(0);
                     removeSelfMenu();
                 })
         );
@@ -180,8 +180,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.setCursorToEnd();
-                    this.setSelectionEnd(0);
+                    this.moveCursorToEnd();
+                    this.setHighlightPos(0);
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.clearAll"), () -> {
@@ -199,8 +199,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.setCursorToEnd();
-                    this.setSelectionEnd(0);
+                    this.moveCursorToEnd();
+                    this.setHighlightPos(0);
                     removeSelfMenu();
                 })
         
@@ -228,8 +228,8 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.setCursorToEnd();
-                    this.setSelectionEnd(0);
+                    this.moveCursorToEnd();
+                    this.setHighlightPos(0);
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.clearAll"), () -> {

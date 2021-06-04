@@ -6,30 +6,37 @@ import net.minecraft.client.CycleOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 
 public class GuiScaleSliderButton extends AbstractSliderButton {
-    private final CycleOption option;
+    private final CycleOption<Integer> option;
     private final Options options;
     private final IntSupplier maxScale;
+    private final Component caption;
+    private final Function<Integer, Component> valueStringifier;
     private long lastActive = -1;
     
-    public GuiScaleSliderButton(CycleOption option, Options options, int i, int j, int k, int l, Component component, IntSupplier maxScale, double d) {
-        super(i, j, k, l, component, d);
+    public GuiScaleSliderButton(CycleOption<Integer> option, Options options, int i, int j, int k, int l, Component caption, Function<Integer, Component> valueStringifier, IntSupplier maxScale, double d) {
+        super(i, j, k, l, getFullMessage(caption, valueStringifier, options.guiScale), d);
         this.option = option;
         this.options = options;
         this.maxScale = maxScale;
+        this.caption = caption;
+        this.valueStringifier = valueStringifier;
     }
     
     @Override
     protected void updateMessage() {
-        int s = this.options.guiScale;
-        this.options.guiScale = Math.round((float) value * maxScale.getAsInt());
-        this.setMessage(this.option.getMessage(options));
-        this.options.guiScale = s;
+        this.setMessage(getFullMessage(caption, valueStringifier, Math.round((float) value * maxScale.getAsInt())));
+    }
+    
+    private static Component getFullMessage(Component caption, Function<Integer, Component> valueStringifier, int value) {
+        return CommonComponents.optionNameValue(caption, valueStringifier.apply(value));
     }
     
     @Override

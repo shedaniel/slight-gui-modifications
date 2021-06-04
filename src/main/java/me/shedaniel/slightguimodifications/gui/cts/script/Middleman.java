@@ -1,5 +1,9 @@
 package me.shedaniel.slightguimodifications.gui.cts.script;
 
+import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.realmsclient.RealmsMainScreen;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.Position;
@@ -10,26 +14,19 @@ import me.shedaniel.slightguimodifications.gui.cts.widgets.LabelWidget;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.AccessibilityOptionsScreen;
-import net.minecraft.client.gui.screens.ConfirmLinkScreen;
-import net.minecraft.client.gui.screens.LanguageSelectScreen;
-import net.minecraft.client.gui.screens.OptionsScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.realms.RealmsBridge;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.LazyLoadedValue;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.Window;
-import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 
 public class Middleman {
     public static Text modMenuText() {
@@ -82,8 +79,7 @@ public class Middleman {
     
     public static void realms() {
         Minecraft client = Minecraft.getInstance();
-        RealmsBridge realmsBridge = new RealmsBridge();
-        realmsBridge.switchToRealms(client.screen);
+        client.setScreen(new RealmsMainScreen(client.screen));
     }
     
     public static void reloadCts() {
@@ -130,7 +126,7 @@ public class Middleman {
             if (builder.getAlign().equals("center")) alignInt = -0.5;
             if (builder.getAlign().equals("right")) alignInt = -1;
             if (alignInt == -1.0) throw new IllegalArgumentException("Illegal alignment: $align");
-            return new CustomizedButtonWidget((int) (position.getX(window.getGuiScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getGuiScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run(), new LazyLoadedValue<>(builder.getTexture()::provide), new LazyLoadedValue<>(builder.getHoveredTexture()::provide));
+            return new CustomizedButtonWidget((int) (position.getX(window.getGuiScaledWidth()) + builder.getWidth() * alignInt), position.getY(window.getGuiScaledHeight()), builder.getWidth(), builder.getHeight(), builder.getText().unwrap(), button -> builder.getOnClicked().run(), Suppliers.memoize(builder.getTexture()::provide), Suppliers.memoize(builder.getHoveredTexture()::provide));
         };
     }
     
@@ -153,7 +149,7 @@ public class Middleman {
     }
     
     public static SlightGuiModificationsConfig.Cts.TextureProvider file(String file) {
-        return new FileTextureProvider(new File(FabricLoader.getInstance().getGameDirectory(), file));
+        return new FileTextureProvider(FabricLoader.getInstance().getGameDir().resolve(file));
     }
     
     public static SlightGuiModificationsConfig.Cts.TextureProvider resource(String file) {
@@ -174,20 +170,20 @@ public class Middleman {
     }
     
     static class FileTextureProvider implements SlightGuiModificationsConfig.Cts.TextureProvider {
-        private File file;
+        private Path file;
         
-        FileTextureProvider(File file) {
+        FileTextureProvider(Path file) {
             this.file = file;
         }
         
         @Override
         public ResourceLocation provide() {
             try {
-                if (!file.exists()) throw new NoSuchFileException(file.getAbsolutePath());
+                if (!Files.exists(file)) throw new NoSuchFileException(file.toAbsolutePath().toString());
                 TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-                return textureManager.register(file.getName() + "_" + file.length(), new DynamicTexture(NativeImage.read(new FileInputStream(file.toPath().normalize().toFile()))));
+                return textureManager.register(file.getFileName().toString() + "_" + Files.size(file), new DynamicTexture(NativeImage.read(new FileInputStream(file.normalize().toFile()))));
             } catch (IOException e) {
-                SlightGuiModifications.LOGGER.error("Failed to load image at " + file.getAbsolutePath(), e);
+                SlightGuiModifications.LOGGER.error("Failed to load image at " + file.toAbsolutePath(), e);
                 return new ResourceLocation("missingno");
             }
         }

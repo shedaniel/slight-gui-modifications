@@ -32,8 +32,6 @@ import java.util.List;
 public abstract class MixinScreen extends AbstractContainerEventHandler implements Widget, AnimationListener, MenuWidgetListener {
     @Shadow
     public int height;
-    @Shadow
-    @Final public List<AbstractWidget> buttons;
     
     @Shadow @Final protected List<GuiEventListener> children;
     @Shadow protected Minecraft minecraft;
@@ -168,7 +166,7 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     
     
     @Inject(method = "renderDirtBackground",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(ILcom/mojang/blaze3d/vertex/VertexFormat;)V", ordinal = 0))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V", ordinal = 0))
     private void preRenderDirtBackground(int alpha, CallbackInfo ci) {
         if (this.renderingState == 2) {
             this.renderingState = 0;

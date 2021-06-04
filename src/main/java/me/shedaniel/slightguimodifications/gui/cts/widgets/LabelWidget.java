@@ -7,6 +7,8 @@ import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +30,7 @@ public class LabelWidget extends AbstractWidget {
     public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
         Minecraft minecraftClient = Minecraft.getInstance();
         Font textRenderer = minecraftClient.font;
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -76,5 +78,10 @@ public class LabelWidget extends AbstractWidget {
             return false;
         }
         return false;
+    }
+    
+    @Override
+    public void updateNarration(NarrationElementOutput output) {
+        output.add(NarratedElementType.TITLE, getMessage());
     }
 }

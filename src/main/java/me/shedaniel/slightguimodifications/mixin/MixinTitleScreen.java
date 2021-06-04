@@ -3,6 +3,7 @@ package me.shedaniel.slightguimodifications.mixin;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.architectury.hooks.client.screen.ScreenHooks;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
@@ -11,6 +12,7 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
@@ -31,10 +33,13 @@ import java.util.Comparator;
 import java.util.List;
 
 @Mixin(TitleScreen.class)
-public class MixinTitleScreen extends Screen {
-    @Shadow @Final public boolean fading;
+public abstract class MixinTitleScreen extends Screen {
+    @Shadow @Final private boolean fading;
     
     @Shadow private long fadeInStart;
+    
+    @Shadow
+    public abstract boolean shouldCloseOnEsc();
     
     @Unique
     private PoseStack lastMatrices;
@@ -84,34 +89,47 @@ public class MixinTitleScreen extends Screen {
             at = @At(value = "TAIL"))
     private void postInit(CallbackInfo ci) {
         if (SlightGuiModifications.getCtsConfig().enabled && SlightGuiModifications.getCtsConfig().clearAllButtons) {
-            List<AbstractWidget> buttons = Lists.newArrayList(this.buttons);
-            this.buttons.clear();
-            this.children.removeAll(buttons);
+            List<GuiEventListener> buttons = Lists.newArrayList(this.children());
+            buttons.removeIf(listener -> !(listener instanceof AbstractWidget));
+            this.children().removeAll(buttons);
+            ScreenHooks.getRenderables(this).removeAll(buttons);
+            ScreenHooks.getNarratables(this).removeAll(buttons);
         }
         if (SlightGuiModifications.getCtsConfig().enabled) {
             for (WidgetElement element : SlightGuiModifications.getCtsConfig().widgetElements) {
                 AbstractWidget widget = element.build(this);
-                this.buttons.add(widget);
-                this.children.add(widget);
+                ScreenHooks.addRenderableWidget(this, widget);
             }
         }
     }
     
-    @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;color4f(FFFF)V", ordinal = 1, shift = At.Shift.AFTER))
-    private void preLogoRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (SlightGuiModifications.getCtsConfig().enabled && SlightGuiModifications.getCtsConfig().removeMinecraftEditionTexture)
-            RenderSystem.color4f(1, 1, 1, 0);
+    @Inject(method = "render", at = @At("HEAD"))
+    private void generateRefmap(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/TextureManager;bind(Lnet/minecraft/resources/ResourceLocation;)V", ordinal = 2))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", remap = false, ordinal = 1,
+                     shift = At.Shift.AFTER))
+    private void preLogoRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (SlightGuiModifications.getCtsConfig().enabled && SlightGuiModifications.getCtsConfig().removeMinecraftEditionTexture)
+            RenderSystem.setShaderColor(1, 1, 1, 0);
+    }
+    
+    @Inject(method = "render",
+            at = {
+                    @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
+                        remap = false,
+                        ordinal = 2),
+                    @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/class_2960;)V",
+                        remap = false,
+                        ordinal = 2)
+            })
     private void preEditionRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (SlightGuiModifications.getCtsConfig().enabled)
             if (SlightGuiModifications.getCtsConfig().removeMinecraftLogoTexture)
-                RenderSystem.color4f(1, 1, 1, 0);
+                RenderSystem.setShaderColor(1, 1, 1, 0);
             else
-                RenderSystem.color4f(1, 1, 1, this.fading ? (float) Mth.ceil(Mth.clamp((float) (Util.getMillis() - this.fadeInStart) / 1000.0F, 0.0F, 1.0F)) : 1.0F);
+                RenderSystem.setShaderColor(1, 1, 1, this.fading ? (float) Mth.ceil(Mth.clamp((float) (Util.getMillis() - this.fadeInStart) / 1000.0F, 0.0F, 1.0F)) : 1.0F);
     }
     
     @Redirect(method = "render",

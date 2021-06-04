@@ -5,13 +5,14 @@
   "plugin": "me.shedaniel.slightguimodifications.asm.SlightGuiModificationsMixinPlugin",
   "client": [
     "MixinAbstractContainerScreen", "MixinAbstractSelectionList", "MixinAbstractSliderButton", "MixinBookEditScreen", "MixinChatScreen", "MixinCubeMapRenderer",
-    "MixinCycleOption", "MixinEditBox", "MixinGameRenderer", "MixinGui", "MixinGuiComponent", "MixinInventoryScreen", "MixinItemRenderer", "MixinRenderItemChangeY",
-    "MixinKeyboardHandler", "MixinMinecraft", "MixinOptionsScreen", "MixinScreen", "MixinScreenshot", "MixinServerSelectionList$OnlineServerEntry",
-    "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance", "MixinWorldSelectionList$WorldListEntry",
-    "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen", "rei.MixinOverlaySearchField",
-    "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
+    "MixinCycleOption", "MixinEditBox", "MixinGameRenderer", "MixinGui", "MixinGuiComponent", "MixinInventoryScreen", "MixinItemRenderer",
+    "MixinKeyboardHandler", "MixinMinecraft", "MixinOptionsScreen", "MixinRenderItemChangeY", "MixinScreen", "MixinScreenshot",
+    "MixinServerSelectionList$OnlineServerEntry", "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance",
+    "MixinWorldSelectionList$WorldListEntry", "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen",
+    "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": ["CycleButtonBuilderAccessor"]
 }

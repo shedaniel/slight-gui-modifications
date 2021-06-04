@@ -26,9 +26,9 @@ public class MixinItemRenderer {
             float alpha = ((AnimationListener) screen).slightguimodifications_getAlpha();
             if (alpha >= 0) {
                 RenderSystem.enableBlend();
-                RenderSystem.disableAlphaTest();
+//                RenderSystem.disableAlphaTest();
                 RenderSystem.defaultBlendFunc();
-                RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//                RenderSystem.shadeModel(GL11.GL_SMOOTH);
 //                SlightGuiModifications.setAlpha(alpha);
             }
         }

@@ -62,7 +62,7 @@ public class MixinGameRenderer {
                 matrices.pushPose();
                 matrices.translate(10, 10, 500);
                 DynamicTexture lastPrettyScreenshotTexture = SlightGuiModifications.lastPrettyScreenshotTexture;
-                minecraft.getTextureManager().bind(lastPrettyScreenshotTextureId);
+                RenderSystem.setShaderTexture(0, lastPrettyScreenshotTextureId);
                 int width = (int) (minecraft.getWindow().getGuiScaledWidth() * .2);
                 int height = (int) (minecraft.getWindow().getGuiScaledWidth() * .2 / lastPrettyScreenshotTexture.getPixels().getWidth() * lastPrettyScreenshotTexture.getPixels().getHeight());
                 GuiComponent.innerBlit(matrices.last().pose(), 0, width, 0, height, 0, 0, 1, 0, 1);
@@ -76,7 +76,7 @@ public class MixinGameRenderer {
             if (prettyScreenshotTime == -1) {
                 prettyScreenshotTime = SlightGuiModifications.prettyScreenshotTime = Util.getMillis();
             }
-            minecraft.getTextureManager().bind(prettyScreenshotTextureId);
+            RenderSystem.setShaderTexture(0, prettyScreenshotTextureId);
             long currentMs = Util.getMillis();
             double scaleTime = 600.0;
             double translateTime = 800.0;
@@ -97,23 +97,21 @@ public class MixinGameRenderer {
                 SlightGuiModifications.prettyScreenshotTextureId = null;
                 SlightGuiModifications.prettyScreenshotTime = -1;
             } else if (!minecraft.options.hideGui && !SlightGuiModifications.prettyScreenshots) {
-                RenderSystem.pushMatrix();
                 matrices.pushPose();
                 matrices.translate(x, y, 500);
                 RenderSystem.enableBlend();
-                RenderSystem.disableAlphaTest();
+//                RenderSystem.disableAlphaTest();
                 RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-                RenderSystem.shadeModel(GL11.GL_SMOOTH);
-                RenderSystem.color4f(1, 1, 1, 1);
+//                RenderSystem.shadeModel(GL11.GL_SMOOTH);
+                RenderSystem.setShaderColor(1, 1, 1, 1);
                 GuiComponent.innerBlit(matrices.last().pose(), 0, width, 0, height, 0, 0, 1, 0, 1);
                 float a = (1 - (float) Mth.clamp((currentMs - prettyScreenshotTime) / fadeTime, 0.0, 1.0));
                 GuiComponent.fill(matrices, 0, 0, width, height, 0xFFFFFF | (int) (a * 255.0F) << 24);
                 matrices.popPose();
-                RenderSystem.popMatrix();
             }
         }
         if (!minecraft.options.hideGui) {
-            if (!(minecraft.overlay instanceof LoadingOverlay)) {
+            if (!(minecraft.getOverlay() instanceof LoadingOverlay)) {
                 long ms = Util.getMillis();
                 if (SlightGuiModifications.getGuiConfig().debugInformation.showFps) {
                     endFps = -1;

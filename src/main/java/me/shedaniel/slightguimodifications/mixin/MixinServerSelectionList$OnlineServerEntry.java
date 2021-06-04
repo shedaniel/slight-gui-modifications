@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.EditServerScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -60,7 +61,8 @@ public abstract class MixinServerSelectionList$OnlineServerEntry {
                             new SplitterMenuEntry(),
                             new TextMenuEntry(I18n.get("selectServer.select"), () -> {
                                 ((MenuWidgetListener) screen).removeMenu();
-                                this.minecraft.setScreen(new ConnectScreen(screen, this.minecraft, getServerData()));
+                                ServerData serverData = getServerData();
+                                ConnectScreen.startConnecting(this.screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData);
                             })
                     )
             ));

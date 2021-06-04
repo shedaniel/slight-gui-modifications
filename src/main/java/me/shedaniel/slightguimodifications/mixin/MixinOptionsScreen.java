@@ -21,7 +21,7 @@ public class MixinOptionsScreen extends Screen {
     @Inject(method = "init", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
         if (FabricLoader.getInstance().isModLoaded("modmenu")) return;
-        this.addButton(new ConfigButtonWidget(this.width - 105, this.height - 25, 100, 20, new TranslatableComponent("text.slightguimodifications"), (buttonWidget) -> {
+        this.addRenderableWidget(new ConfigButtonWidget(this.width - 105, this.height - 25, 100, 20, new TranslatableComponent("text.slightguimodifications"), (buttonWidget) -> {
             this.minecraft.setScreen(SlightGuiModifications.getConfigScreen(this));
         }));
     }

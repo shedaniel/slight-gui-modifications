@@ -7,14 +7,15 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.util.Mth;
 
+import java.util.function.Supplier;
+
 public class CustomizedButtonWidget extends Button {
-    private final LazyLoadedValue<ResourceLocation> texture;
-    private final LazyLoadedValue<ResourceLocation> hoveredTexture;
+    private final Supplier<ResourceLocation> texture;
+    private final Supplier<ResourceLocation> hoveredTexture;
     
-    public CustomizedButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress, LazyLoadedValue<ResourceLocation> texture, LazyLoadedValue<ResourceLocation> hoveredTexture) {
+    public CustomizedButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress, Supplier<ResourceLocation> texture, Supplier<ResourceLocation> hoveredTexture) {
         super(x, y, width, height, message, onPress);
         this.texture = texture;
         this.hoveredTexture = hoveredTexture;
@@ -29,15 +30,15 @@ public class CustomizedButtonWidget extends Button {
                 textureId = hoveredTextureId;
             Minecraft minecraftClient = Minecraft.getInstance();
             Font textRenderer = minecraftClient.font;
-            minecraftClient.getTextureManager().bind(textureId);
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+            RenderSystem.setShaderTexture(0, textureId);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
             innerBlit(matrices.last().pose(), x, x + width, y, y + height, getBlitOffset(), 0F, 1F, 0F, 1F);
             this.renderBg(matrices, minecraftClient, mouseX, mouseY);
             int j = this.active ? 16777215 : 10526880;
-            this.drawCenteredString(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
+            drawCenteredString(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
             if (this.isHovered()) {
                 this.renderToolTip(matrices, mouseX, mouseY);
             }

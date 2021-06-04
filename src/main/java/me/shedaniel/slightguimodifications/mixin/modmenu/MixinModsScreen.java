@@ -20,16 +20,16 @@ public abstract class MixinModsScreen extends Screen {
     @Inject(method = "overlayBackground",
             at = @At(value = "HEAD"), remap = false)
     private static void preRenderHoleBackground(int x1, int y1, int x2, int y2, int red, int green, int blue, int startAlpha, int endAlpha, CallbackInfo ci) {
-        RenderSystem.pushMatrix();
+//        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
-        RenderSystem.disableAlphaTest();
+//        RenderSystem.disableAlphaTest();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
     }
     
     @Inject(method = "overlayBackground",
             at = @At(value = "RETURN"), remap = false)
     private static void postRenderHoleBackground(int x1, int y1, int x2, int y2, int red, int green, int blue, int startAlpha, int endAlpha, CallbackInfo ci) {
-        RenderSystem.popMatrix();
+//        RenderSystem.popMatrix();
     }
 }

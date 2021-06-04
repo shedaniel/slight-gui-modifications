@@ -6,8 +6,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.gui.OverlaySearchField;
-import me.shedaniel.rei.gui.widget.TextFieldWidget;
+import me.shedaniel.rei.impl.client.gui.widget.basewidgets.TextFieldWidget;
+import me.shedaniel.rei.impl.client.gui.widget.search.OverlaySearchField;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuEntry;
@@ -43,8 +43,8 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     
     @Unique
     private void renderTextureBorder(PoseStack matrices) {
-        Minecraft.getInstance().getTextureManager().bind(SlightGuiModifications.TEXT_FIELD_TEXTURE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, SlightGuiModifications.TEXT_FIELD_TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
         RenderSystem.blendFunc(770, 771);
@@ -69,18 +69,20 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     }
     
     @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/gui/OverlaySearchField;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V", ordinal = 2),
+               at = @At(value = "INVOKE",
+                        target = "Lme/shedaniel/rei/impl/client/gui/widget/search/OverlaySearchField;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+                        ordinal = 2),
                index = 5)
     private int modifyBackgroundColor(int color) {return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;}
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (getBounds().contains(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1) {
-            if (editable) if (selectionStart - selectionEnd != 0)
+            if (editable) if (cursorPos - highlightPos != 0)
                 ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, getBounds().y - 2), createSelectingMenu()));
             else
                 ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, getBounds().y - 2), createNonSelectingMenu()));
-            else if (selectionStart - selectionEnd != 0)
+            else if (cursorPos - highlightPos != 0)
                 ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, getBounds().y - 2), createSelectingNotEditableMenu()));
             else
                 ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, getBounds().y - 2), createNonSelectingNotEditableMenu()));
@@ -96,8 +98,8 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     @Unique
     private List<MenuEntry> createNonSelectingNotEditableMenu() {
         return ImmutableList.of(new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-            this.setCursorToEnd();
-            this.setSelectionEnd(0);
+            this.moveCursorToEnd();
+            this.setHighlightPos(0);
             removeSelfMenu();
         }));
     }
@@ -108,8 +110,8 @@ public class MixinOverlaySearchField extends TextFieldWidget {
             if (this.editable) this.addText(Minecraft.getInstance().keyboardHandler.getClipboard());
             removeSelfMenu();
         }), new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-            this.setCursorToEnd();
-            this.setSelectionEnd(0);
+            this.moveCursorToEnd();
+            this.setHighlightPos(0);
             removeSelfMenu();
         }), new TextMenuEntry(I18n.get("text.slightguimodifications.clearAll"), () -> {
             this.setText("");
@@ -123,8 +125,8 @@ public class MixinOverlaySearchField extends TextFieldWidget {
             Minecraft.getInstance().keyboardHandler.setClipboard(this.getSelectedText());
             removeSelfMenu();
         }), new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-            this.setCursorToEnd();
-            this.setSelectionEnd(0);
+            this.moveCursorToEnd();
+            this.setHighlightPos(0);
             removeSelfMenu();
         }));
     }
@@ -142,8 +144,8 @@ public class MixinOverlaySearchField extends TextFieldWidget {
             if (this.editable) this.addText(Minecraft.getInstance().keyboardHandler.getClipboard());
             removeSelfMenu();
         }), new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-            this.setCursorToEnd();
-            this.setSelectionEnd(0);
+            this.moveCursorToEnd();
+            this.setHighlightPos(0);
             removeSelfMenu();
         }), new TextMenuEntry(I18n.get("text.slightguimodifications.clearAll"), () -> {
             this.setText("");
