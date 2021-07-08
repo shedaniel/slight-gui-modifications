@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboardHandler {
     @Inject(method = "keyPress", at = @At(value = "INVOKE",
-                                          target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;IILcom/mojang/blaze3d/pipeline/RenderTarget;Ljava/util/function/Consumer;)V"))
+                                          target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;Lcom/mojang/blaze3d/pipeline/RenderTarget;Ljava/util/function/Consumer;)V"))
     private void preSaveScreenshot(long window, int key, int scancode, int i, int j, CallbackInfo ci) {
         SlightGuiModifications.startPrettyScreenshot(null);
         if (SlightGuiModifications.getGuiConfig().satisfyingScreenshots) {

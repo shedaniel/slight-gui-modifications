@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @Mixin(Screenshot.class)
 public abstract class MixinScreenshot {
     @Shadow
-    public static NativeImage takeScreenshot(int width, int height, RenderTarget framebuffer) {
+    public static NativeImage takeScreenshot(RenderTarget framebuffer) {
         return null;
     }
     
@@ -31,9 +31,9 @@ public abstract class MixinScreenshot {
     }
     
     @Inject(method = "_grab", at = @At(value = "RETURN"))
-    private static void preScreenshotConsumer(File gameDirectory, String fileName, int framebufferWidth, int framebufferHeight, RenderTarget framebuffer, Consumer<Component> messageReceiver, CallbackInfo ci) {
+    private static void preScreenshotConsumer(File gameDirectory, String fileName,  RenderTarget framebuffer, Consumer<Component> messageReceiver, CallbackInfo ci) {
         if (SlightGuiModifications.prettyScreenshots) {
-            NativeImage image = takeScreenshot(framebufferWidth, framebufferHeight, framebuffer);
+            NativeImage image = takeScreenshot(framebuffer);
             SlightGuiModifications.startPrettyScreenshot(image);
         } else {
             SlightGuiModifications.startPrettyScreenshot(null);
