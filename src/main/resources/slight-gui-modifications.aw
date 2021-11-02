@@ -13,3 +13,4 @@ accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lcom/mojang/m
 accessible field net/minecraft/client/gui/screens/TitleScreen panorama Lnet/minecraft/client/renderer/PanoramaRenderer;
 accessible field net/minecraft/client/gui/screens/TitleScreen PANORAMA_OVERLAY Lnet/minecraft/resources/ResourceLocation;
 accessible class net/minecraft/client/gui/components/toasts/ToastComponent$ToastInstance
+accessible class net/minecraft/client/gui/screens/inventory/MerchantScreen$TradeOfferButton

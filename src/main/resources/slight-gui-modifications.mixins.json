@@ -9,7 +9,8 @@
     "MixinKeyboardHandler", "MixinMinecraft", "MixinOptionsScreen", "MixinRenderItemChangeY", "MixinScreen", "MixinScreenshot",
     "MixinServerSelectionList$OnlineServerEntry", "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance",
     "MixinWorldSelectionList$WorldListEntry", "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen",
-    "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen"
+    "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen",
+    "MixinAbstractWidget"
   ],
   "injectors": {
     "defaultRequire": 1
