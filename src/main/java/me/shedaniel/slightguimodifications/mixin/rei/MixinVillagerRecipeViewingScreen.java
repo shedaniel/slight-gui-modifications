@@ -19,9 +19,14 @@ public class MixinVillagerRecipeViewingScreen extends Screen {
     }
     
     @Redirect(method = "render", at = @At(value = "INVOKE",
-                                          target = "Lme/shedaniel/rei/impl/client/gui/screen/CompositeDisplayViewingScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V",
+                                          target = "Lme/shedaniel/rei/impl/client/gui/screen/CompositeDisplayViewingScreen;renderBackground(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
                                           ordinal = 0))
-    private void fillGradient(CompositeDisplayViewingScreen screen, PoseStack matrices, int top, int left, int right, int bottom, int color1, int color2) {
+    private void fillGradient(CompositeDisplayViewingScreen screen, PoseStack matrices) {
+        int left = 0;
+        int top = 0;
+        int right = width;
+        int bottom = height;
+        int color1 = -1072689136, color2 = -804253680;
         if (screen instanceof AnimationListener listener) {
             if (listener.slightguimodifications_getAnimationState() == 2) {
                 float alpha = listener.slightguimodifications_getEasedYOffset();

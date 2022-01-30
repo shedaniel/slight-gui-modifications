@@ -32,5 +32,8 @@
     "cloth-client-events-v0": ">=2-",
     "fabric": "*",
     "modmenu": ">=2-"
+  },
+  "breaks": {
+    "roughly-enough-items": "<6.4.417"
   }
 }
