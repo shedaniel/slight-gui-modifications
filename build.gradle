@@ -1,5 +1,5 @@
 plugins {
-    id 'dev.architectury.loom' version '0.8.0-SNAPSHOT'
+    id 'dev.architectury.loom' version '0.11.0-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -9,8 +9,8 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-minecraft {
-    accessWidener = file("src/main/resources/slight-gui-modifications.aw")
+loom {
+    accessWidenerPath = file("src/main/resources/slight-gui-modifications.aw")
 }
 
 sourceSets {
@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
-    mappings(minecraft.officialMojangMappings())
+    mappings(loom.officialMojangMappings())
     optionally("net.fabricmc:fabric-loader:${project.loader_version}")
 
     modApi("net.fabricmc.fabric-api:fabric-api:${project.api_version}") {
@@ -79,7 +79,7 @@ def optionally(str) {
 }
 
 def runtime(str) {
-    dependencies.modRuntime(str) {
+    dependencies.modLocalRuntime(str) {
         exclude(group: "net.fabricmc")
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "io.github.prospector")

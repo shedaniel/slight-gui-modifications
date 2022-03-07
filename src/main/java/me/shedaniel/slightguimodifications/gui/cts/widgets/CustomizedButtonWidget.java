@@ -26,7 +26,7 @@ public class CustomizedButtonWidget extends Button {
         ResourceLocation textureId = texture.get();
         if (textureId != null) {
             ResourceLocation hoveredTextureId = hoveredTexture.get();
-            if (isHovered() && hoveredTextureId != null)
+            if (isHoveredOrFocused() && hoveredTextureId != null)
                 textureId = hoveredTextureId;
             Minecraft minecraftClient = Minecraft.getInstance();
             Font textRenderer = minecraftClient.font;
@@ -39,7 +39,7 @@ public class CustomizedButtonWidget extends Button {
             this.renderBg(matrices, minecraftClient, mouseX, mouseY);
             int j = this.active ? 16777215 : 10526880;
             drawCenteredString(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
-            if (this.isHovered()) {
+            if (this.isHoveredOrFocused()) {
                 this.renderToolTip(matrices, mouseX, mouseY);
             }
             return;

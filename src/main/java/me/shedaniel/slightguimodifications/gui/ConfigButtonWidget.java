@@ -20,7 +20,7 @@ public class ConfigButtonWidget extends Button {
         Font textRenderer = minecraftClient.font;
         RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-        int i = this.getYImage(this.isHovered());
+        int i = this.getYImage(this.isHoveredOrFocused());
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
