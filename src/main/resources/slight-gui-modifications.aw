@@ -1,6 +1,5 @@
 accessWidener   v1  named
 accessible field net/minecraft/client/Minecraft fps I
-accessible field net/minecraft/client/gui/screens/Screen buttons Ljava/util/List;
 accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i
 accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache
 accessible method net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i <init> (II)V
