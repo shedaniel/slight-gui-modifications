@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
 @Config(name = "slightguimodifications")
@@ -163,7 +164,7 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         public boolean removeMinecraftLogoTexture = false;
         public boolean clearAllButtons = false;
         public boolean clearAllLabels = false;
-        public List<WidgetElement> widgetElements = new ArrayList<>();
+        public List<WidgetElement> widgetElements = new CopyOnWriteArrayList<>();
         public List<BackgroundInfo> backgroundInfos = new ArrayList<>(Collections.singletonList(new DefaultBackgroundInfo()));
         public long backgroundStayLength = 10000;
         public long backgroundFadeLength = 1000;

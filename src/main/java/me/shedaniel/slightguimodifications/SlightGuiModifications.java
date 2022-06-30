@@ -31,7 +31,7 @@ import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.controls.ControlsScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
@@ -174,13 +174,13 @@ public class SlightGuiModifications implements ClientModInitializer {
         AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
         AutoConfig.getGuiRegistry(SlightGuiModificationsConfig.class).registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
-                        ConfigEntryBuilder.create().startIntSlider(new TranslatableComponent(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
+                        ConfigEntryBuilder.create().startIntSlider(Component.translatable(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
                                 (Minecraft.getInstance().getWindow().calculateScale(0, false) + 4) * 100)
                                 .setDefaultValue(0)
                                 .setTextGetter(integer -> {
                                     if (integer <= 100)
-                                        return new TranslatableComponent(i13n + ".text.disabled");
-                                    return new TranslatableComponent(i13n + ".text", integer / 100.0);
+                                        return Component.translatable(i13n + ".text.disabled");
+                                    return Component.translatable(i13n + ".text", integer / 100.0);
                                 })
                                 .setSaveConsumer(integer -> setUnsafely(field, config, integer / 100.0))
                                 .build()
@@ -336,7 +336,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 Minecraft.getInstance().resizeDisplay();
             });
             builder.setAfterInitConsumer(screen -> {
-                ScreenHooks.addRenderableWidget(screen, new Button(screen.width - 104, 4, 100, 20, new TranslatableComponent("text.slightguimodifications.reloadCts"), button -> {
+                ScreenHooks.addRenderableWidget(screen, new Button(screen.width - 104, 4, 100, 20, Component.translatable("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.resetCts();
                     SlightGuiModifications.reloadCts();
                 }));

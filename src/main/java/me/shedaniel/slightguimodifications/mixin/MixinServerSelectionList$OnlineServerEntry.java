@@ -17,7 +17,6 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,10 +50,10 @@ public abstract class MixinServerSelectionList$OnlineServerEntry {
                                 ((MenuWidgetListener) screen).removeMenu();
                                 String string = getServerData().name;
                                 if (string != null) {
-                                    Component text = new TranslatableComponent("selectServer.deleteQuestion");
-                                    Component text2 = new TranslatableComponent("selectServer.deleteWarning", string);
-                                    Component string2 = new TranslatableComponent("selectServer.deleteButton");
-                                    Component string3 = new TranslatableComponent("gui.cancel");
+                                    Component text = Component.translatable("selectServer.deleteQuestion");
+                                    Component text2 = Component.translatable("selectServer.deleteWarning", string);
+                                    Component string2 = Component.translatable("selectServer.deleteButton");
+                                    Component string3 = Component.translatable("gui.cancel");
                                     this.minecraft.setScreen(new ConfirmScreen(screen::deleteCallback, text, text2, string2, string3));
                                 }
                             }),

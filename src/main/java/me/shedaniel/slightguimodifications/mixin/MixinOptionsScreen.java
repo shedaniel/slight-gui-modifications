@@ -6,7 +6,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +20,7 @@ public class MixinOptionsScreen extends Screen {
     @Inject(method = "init", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
         if (FabricLoader.getInstance().isModLoaded("modmenu")) return;
-        this.addRenderableWidget(new ConfigButtonWidget(this.width - 105, this.height - 25, 100, 20, new TranslatableComponent("text.slightguimodifications"), (buttonWidget) -> {
+        this.addRenderableWidget(new ConfigButtonWidget(this.width - 105, this.height - 25, 100, 20, Component.translatable("text.slightguimodifications"), (buttonWidget) -> {
             this.minecraft.setScreen(SlightGuiModifications.getConfigScreen(this));
         }));
     }

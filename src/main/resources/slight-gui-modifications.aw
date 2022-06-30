@@ -13,3 +13,9 @@ accessible field net/minecraft/client/gui/screens/TitleScreen panorama Lnet/mine
 accessible field net/minecraft/client/gui/screens/TitleScreen PANORAMA_OVERLAY Lnet/minecraft/resources/ResourceLocation;
 accessible class net/minecraft/client/gui/components/toasts/ToastComponent$ToastInstance
 accessible class net/minecraft/client/gui/screens/inventory/MerchantScreen$TradeOfferButton
+accessible class net/minecraft/client/OptionInstance$ValueSet
+accessible class net/minecraft/client/OptionInstance$SliderableOrCyclableValueSet
+accessible class net/minecraft/client/OptionInstance$SliderableValueSet
+accessible class net/minecraft/client/OptionInstance$OptionInstanceSliderButton
+extendable class net/minecraft/client/OptionInstance$OptionInstanceSliderButton
+accessible method net/minecraft/client/OptionInstance$OptionInstanceSliderButton <init> (Lnet/minecraft/client/Options;IIIILnet/minecraft/client/OptionInstance;Lnet/minecraft/client/OptionInstance$SliderableValueSet;Lnet/minecraft/client/OptionInstance$TooltipSupplier;)V

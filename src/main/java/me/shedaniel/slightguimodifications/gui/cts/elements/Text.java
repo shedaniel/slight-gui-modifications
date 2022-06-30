@@ -1,10 +1,11 @@
 package me.shedaniel.slightguimodifications.gui.cts.elements;
 
-import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class Text {
     private MutableComponent text;
@@ -22,7 +23,12 @@ public final class Text {
     }
     
     public String asString() {
-        return this.text.getContents();
+        StringBuilder stringBuilder = new StringBuilder();
+        this.text.getContents().visit((string) -> {
+            stringBuilder.append(string);
+            return Optional.empty();
+        });
+        return stringBuilder.toString();
     }
     
     public String getString() {
@@ -46,11 +52,11 @@ public final class Text {
     }
     
     public static Text literal(String s) {
-        return wrap(new TextComponent(s));
+        return wrap(Component.literal(s));
     }
     
     public static Text translatable(String s, Object... objects) {
-        return wrap(new TranslatableComponent(s, Stream.of(objects).map(o -> {
+        return wrap(Component.translatable(s, Stream.of(objects).map(o -> {
             if (o instanceof Text)
                 return ((Text) o).text;
             return o;

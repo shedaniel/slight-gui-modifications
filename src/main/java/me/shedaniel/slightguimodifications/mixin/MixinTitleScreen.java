@@ -120,9 +120,8 @@ public abstract class MixinTitleScreen extends Screen {
                     @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
                         remap = false,
                         ordinal = 2),
-                    @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/class_2960;)V",
-                        remap = false,
-                        ordinal = 2)
+                    @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/TitleScreen;warningLabel:Lnet/minecraft/client/gui/screens/TitleScreen$WarningLabel;",
+                        ordinal = 0)
             })
     private void preEditionRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (SlightGuiModifications.getCtsConfig().enabled)
