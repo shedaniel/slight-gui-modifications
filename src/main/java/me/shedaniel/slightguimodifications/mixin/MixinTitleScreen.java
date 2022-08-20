@@ -5,7 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.hooks.client.screen.ScreenHooks;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
-import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
+import me.shedaniel.slightguimodifications.config.Cts;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import net.minecraft.Util;
@@ -55,17 +55,17 @@ public abstract class MixinTitleScreen extends Screen {
     
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PanoramaRenderer;render(FF)V"))
     private void thing(PanoramaRenderer rotatingCubeMapRenderer, float delta, float alpha) {
-        SlightGuiModificationsConfig.Cts cts = SlightGuiModifications.getCtsConfig();
+        Cts cts = SlightGuiModifications.getCtsConfig();
         if (!cts.enabled) {
             rotatingCubeMapRenderer.render(delta, alpha);
         } else {
             fill(lastMatrices, 0, 0, this.width, this.height, 0xFF000000);
             int tmp = ((AnimationListener) this).slightguimodifications_getAnimationState();
             ((AnimationListener) this).slightguimodifications_setAnimationState(0);
-            List<SlightGuiModificationsConfig.Cts.BackgroundInfo> list = Lists.newArrayList(cts.backgroundInfos);
-            list.sort(Comparator.comparingDouble(SlightGuiModificationsConfig.Cts.BackgroundInfo::getAlpha));
+            List<Cts.BackgroundInfo> list = Lists.newArrayList(cts.backgroundInfos);
+            list.sort(Comparator.comparingDouble(Cts.BackgroundInfo::getAlpha));
             Collections.reverse(list);
-            for (SlightGuiModificationsConfig.Cts.BackgroundInfo info : list) {
+            for (Cts.BackgroundInfo info : list) {
                 if (info.getAlpha() > 0)
                     info.render(lastMatrices, (TitleScreen) (Object) this, delta, alpha);
             }

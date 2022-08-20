@@ -5,7 +5,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.realmsclient.RealmsMainScreen;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
-import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
+import me.shedaniel.slightguimodifications.config.Cts;
 import me.shedaniel.slightguimodifications.gui.cts.Position;
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
@@ -143,20 +143,20 @@ public class Middleman {
         
         Runnable getOnClicked();
         
-        SlightGuiModificationsConfig.Cts.TextureProvider getTexture();
+        Cts.TextureProvider getTexture();
         
-        SlightGuiModificationsConfig.Cts.TextureProvider getHoveredTexture();
+        Cts.TextureProvider getHoveredTexture();
     }
     
-    public static SlightGuiModificationsConfig.Cts.TextureProvider file(String file) {
+    public static Cts.TextureProvider file(String file) {
         return new FileTextureProvider(FabricLoader.getInstance().getGameDir().resolve(file));
     }
     
-    public static SlightGuiModificationsConfig.Cts.TextureProvider resource(String file) {
+    public static Cts.TextureProvider resource(String file) {
         return new ResourceTextureProvider(file);
     }
     
-    static class ResourceTextureProvider implements SlightGuiModificationsConfig.Cts.TextureProvider {
+    static class ResourceTextureProvider implements Cts.TextureProvider {
         private ResourceLocation identifier;
         
         ResourceTextureProvider(String identifier) {
@@ -169,7 +169,7 @@ public class Middleman {
         }
     }
     
-    static class FileTextureProvider implements SlightGuiModificationsConfig.Cts.TextureProvider {
+    static class FileTextureProvider implements Cts.TextureProvider {
         private Path file;
         
         FileTextureProvider(Path file) {

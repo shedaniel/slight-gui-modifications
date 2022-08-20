@@ -13,6 +13,7 @@ import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.LazyResettable;
 import me.shedaniel.math.Point;
+import me.shedaniel.slightguimodifications.config.Cts;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
@@ -171,11 +172,11 @@ public class SlightGuiModifications implements ClientModInitializer {
     
     @Override
     public void onInitializeClient() {
-        AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
+        getGuiConfig();
         AutoConfig.getGuiRegistry(SlightGuiModificationsConfig.class).registerAnnotationProvider(
                 (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                         ConfigEntryBuilder.create().startIntSlider(Component.translatable(i13n), (int) (Math.max(1, getUnsafely(field, config, 0.0)) * 100), 100,
-                                (Minecraft.getInstance().getWindow().calculateScale(0, false) + 4) * 100)
+                                        (Minecraft.getInstance().getWindow().calculateScale(0, false) + 4) * 100)
                                 .setDefaultValue(0)
                                 .setTextGetter(integer -> {
                                     if (integer <= 100)
@@ -269,7 +270,7 @@ public class SlightGuiModifications implements ClientModInitializer {
         });
     }
     
-    public static final LazyResettable<SlightGuiModificationsConfig.Cts> CTS = new LazyResettable<>(SlightGuiModificationsConfig.Cts::new);
+    public static final LazyResettable<Cts> CTS = new LazyResettable<>(Cts::new);
     
     public static void reloadCtsAsync() {
         CtsRegistry.loadScriptsAsync();
@@ -310,11 +311,18 @@ public class SlightGuiModifications implements ClientModInitializer {
         return point1 * Math.pow(1 - value, 3) + 3 * point2 * Math.pow(1 - value, 2) * value + 3 * point2 * (1 - value) * Math.pow(value, 2) + point4 * Math.pow(value, 3);
     }
     
+    private static boolean configInitialized = false;
+    
     public static SlightGuiModificationsConfig.Gui getGuiConfig() {
+        if (!configInitialized) {
+            AutoConfig.register(SlightGuiModificationsConfig.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
+            configInitialized = true;
+        }
+        
         return AutoConfig.getConfigHolder(SlightGuiModificationsConfig.class).getConfig().gui;
     }
     
-    public static SlightGuiModificationsConfig.Cts getCtsConfig() {
+    public static Cts getCtsConfig() {
         return CTS.get();
     }
     

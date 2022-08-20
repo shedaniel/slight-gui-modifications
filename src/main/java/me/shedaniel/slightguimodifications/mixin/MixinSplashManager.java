@@ -2,7 +2,7 @@ package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.Lists;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
-import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
+import me.shedaniel.slightguimodifications.config.Cts;
 import net.minecraft.client.resources.SplashManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -25,11 +25,11 @@ public class MixinSplashManager {
     private List<String> vanillaSplashTexts = Lists.newArrayList();
     
     @Unique
-    private void prepareForModded(boolean enabled, SlightGuiModificationsConfig.Cts.SplashText.CustomSplashesApplyMode applyMode, List<String> customSplashes) {
+    private void prepareForModded(boolean enabled, Cts.SplashText.CustomSplashesApplyMode applyMode, List<String> customSplashes) {
         if (!enabled) {
             this.splashes = Lists.newArrayList(this.vanillaSplashTexts);
         } else {
-            if (applyMode == SlightGuiModificationsConfig.Cts.SplashText.CustomSplashesApplyMode.APPEND) {
+            if (applyMode == Cts.SplashText.CustomSplashesApplyMode.APPEND) {
                 this.splashes = Lists.newArrayList(this.vanillaSplashTexts);
                 this.splashes.addAll(customSplashes);
             } else {
@@ -45,7 +45,7 @@ public class MixinSplashManager {
     
     @Inject(method = "getSplash", at = @At("HEAD"), cancellable = true)
     private void preGet(CallbackInfoReturnable<String> cir) {
-        SlightGuiModificationsConfig.Cts config = SlightGuiModifications.getCtsConfig();
+        Cts config = SlightGuiModifications.getCtsConfig();
         if (config.enabled && config.splashText.enabled) {
             if (config.splashText.removeSplashes) {
                 cir.setReturnValue("");

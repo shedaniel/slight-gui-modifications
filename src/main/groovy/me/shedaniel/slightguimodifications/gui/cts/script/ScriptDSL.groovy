@@ -1,7 +1,7 @@
 package me.shedaniel.slightguimodifications.gui.cts.script
 
 import me.shedaniel.slightguimodifications.SlightGuiModifications
-import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig
+import me.shedaniel.slightguimodifications.config.Cts
 import me.shedaniel.slightguimodifications.gui.cts.CtsRegistry
 import me.shedaniel.slightguimodifications.gui.cts.Position
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text
@@ -171,7 +171,7 @@ class ScriptDSL {
         }
 
         def setApplyMode(mode) {
-            SlightGuiModifications.getCtsConfig().splashText.customSplashesApplyMode = SlightGuiModificationsConfig.Cts.SplashText.CustomSplashesApplyMode.valueOf(mode.toUpperCase(Locale.ROOT))
+            SlightGuiModifications.getCtsConfig().splashText.customSplashesApplyMode = Cts.SplashText.CustomSplashesApplyMode.valueOf(mode.toUpperCase(Locale.ROOT))
         }
 
         String getApplyMode() {
@@ -220,7 +220,7 @@ class ScriptDSL {
             def texture
 
             def build() {
-                new SlightGuiModificationsConfig.Cts.TextureProvidedBackgroundInfo(texture)
+                new Cts.TextureProvidedBackgroundInfo(texture)
             }
         }
     }
@@ -271,8 +271,8 @@ class ScriptDSL {
 
     static class ButtonBuilder implements Middleman.ButtonBuilder {
         Text text = literal("")
-        SlightGuiModificationsConfig.Cts.TextureProvider texture = { null }
-        SlightGuiModificationsConfig.Cts.TextureProvider hoveredTexture = { null }
+        Cts.TextureProvider texture = { null }
+        Cts.TextureProvider hoveredTexture = { null }
         String align = "left"
         PositionBuilder position = new PositionBuilder()
         Closure onClicked = {}
