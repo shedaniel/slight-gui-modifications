@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.impl.client.gui.widget.TabWidget;
+import me.shedaniel.rei.impl.client.gui.InternalTextures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
@@ -71,7 +71,7 @@ public class SubMenuEntry extends MenuEntry {
         }
         Minecraft.getInstance().font.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
         if (!entries.isEmpty()) {
-            RenderSystem.setShaderTexture(0, TabWidget.CHEST_GUI_TEXTURE);
+            RenderSystem.setShaderTexture(0, InternalTextures.CHEST_GUI_TEXTURE);
             blit(matrices, x + width - 15, y - 2, 0, 28, 18, 18);
         }
     }

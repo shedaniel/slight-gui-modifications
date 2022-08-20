@@ -23,7 +23,7 @@ public abstract class MixinModListWidget extends AbstractSelectionList {
     
     @Inject(method = "renderList",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V"))
-    private void preSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void preSelectionBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
 //        RenderSystem.disableAlphaTest();
@@ -37,7 +37,7 @@ public abstract class MixinModListWidget extends AbstractSelectionList {
     
     @Inject(method = "renderList",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
-    private void postSelectionBufferDraw(PoseStack matrices, int x, int y, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void postSelectionBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.popMatrix();
         SlightGuiModifications.restoreAlpha();
     }
