@@ -3,13 +3,13 @@ package me.shedaniel.slightguimodifications;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.architectury.event.events.client.ClientTooltipEvent;
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.hooks.client.screen.ScreenHooks;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.gui.ConfigScreenProvider;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
-import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.LazyResettable;
 import me.shedaniel.math.Point;
@@ -27,7 +27,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.controls.ControlsScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -44,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
 import static me.shedaniel.autoconfig.util.Utils.setUnsafely;
@@ -188,17 +189,17 @@ public class SlightGuiModifications implements ClientModInitializer {
                 ),
                 SlightGuiModificationsConfig.Gui.ScaleSlider.class
         );
-        ClothClientHooks.SCREEN_MOUSE_CLICKED.register((client, screen, mouseX, mouseY, mouseButton) -> {
+        ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((client, screen, mouseX, mouseY, mouseButton) -> {
             if (((MenuWidgetListener) screen).getMenu() != null) {
                 if (!((MenuWidgetListener) screen).getMenu().mouseClicked(mouseX, mouseY, mouseButton)) {
                     ((MenuWidgetListener) screen).removeMenu();
                 }
-                return InteractionResult.SUCCESS;
+                return EventResult.interruptTrue();
             }
             if (SlightGuiModifications.getGuiConfig().rightClickActions && mouseButton == 1) {
                 // Pause Menu
                 if (screen instanceof PauseScreen || screen instanceof TitleScreen) {
-                    Optional<Widget> optionsButton = ScreenHooks.getRenderables(screen).stream()
+                    Optional<Renderable> optionsButton = ScreenHooks.getRenderables(screen).stream()
                             .filter(button -> button instanceof AbstractWidget widget && widget.getMessage().getString().equals(I18n.get("menu.options"))).findFirst();
                     if (optionsButton.isPresent() && ((AbstractWidget) optionsButton.get()).isMouseOver(mouseX, mouseY)) {
                         ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
@@ -220,17 +221,17 @@ public class SlightGuiModifications implements ClientModInitializer {
                     }
                 }
             }
-            return InteractionResult.PASS;
+            return EventResult.pass();
         });
-        ClientTooltipEvent.RENDER_MODIFY_COLOR.register((poseStack, x, y, colorContext) -> {
-            SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
-            SlightGuiModificationsConfig.Gui.TooltipModifications modifications = config.tooltipModifications;
-            if (modifications.enabled) {
-                colorContext.setBackgroundColor(modifications.backgroundColor);
-                colorContext.setOutlineGradientTopColor(modifications.outlineGradientTopColor);
-                colorContext.setOutlineGradientBottomColor(modifications.outlineGradientBottomColor);
-            }
-        });
+//        ClientTooltipEvent.RENDER_MODIFY_COLOR.register((poseStack, x, y, colorContext) -> {
+//            SlightGuiModificationsConfig.Gui config = SlightGuiModifications.getGuiConfig();
+//            SlightGuiModificationsConfig.Gui.TooltipModifications modifications = config.tooltipModifications;
+//            if (modifications.enabled) {
+//                colorContext.setBackgroundColor(modifications.backgroundColor);
+//                colorContext.setOutlineGradientTopColor(modifications.outlineGradientTopColor);
+//                colorContext.setOutlineGradientBottomColor(modifications.outlineGradientBottomColor);
+//            }
+//        });
         reloadCtsAsync();
         RRPCallback.AFTER_VANILLA.register(packs -> {
             RuntimeResourcePack pack = RuntimeResourcePack.create("slightguimodifications:cts_textures");
@@ -347,7 +348,7 @@ public class SlightGuiModifications implements ClientModInitializer {
                 ScreenHooks.addRenderableWidget(screen, new Button(screen.width - 104, 4, 100, 20, Component.translatable("text.slightguimodifications.reloadCts"), button -> {
                     SlightGuiModifications.resetCts();
                     SlightGuiModifications.reloadCts();
-                }));
+                }, Supplier::get) {});
             });
             return builder.build();
         });

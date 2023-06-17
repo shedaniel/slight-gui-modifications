@@ -45,7 +45,7 @@
   "text.autoconfig.slightguimodifications.option.gui.rightClickActions": "Right Click Actions:",
   "text.autoconfig.slightguimodifications.option.gui.rightClickActions.@Tooltip": "Whether GUI should allow right click actions.",
   "text.autoconfig.slightguimodifications.option.gui.customScaling": "Custom Scaling",
-  "text.autoconfig.slightguimodifications.option.gui.customScaling.vanillaScaleSlider": "Vanilla Scale Slider:",
+  "text.autoconfig.slightguimodifications.option.gui.customScaling.modifyVanillaScaleSlider": "Modify Vanilla Scale Slider:",
   "text.autoconfig.slightguimodifications.option.gui.customScaling.scale": "Scale:",
   "text.autoconfig.slightguimodifications.option.gui.customScaling.scale.text": "Scale: %.2f",
   "text.autoconfig.slightguimodifications.option.gui.customScaling.scale.text.disabled": "Disabled Custom Scaling",

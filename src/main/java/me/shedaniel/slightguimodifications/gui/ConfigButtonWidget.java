@@ -9,9 +9,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import java.util.function.Supplier;
+
 public class ConfigButtonWidget extends Button {
-    public ConfigButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress) {
-        super(x, y, width, height, message, onPress);
+    public ConfigButtonWidget(int i, int j, int k, int l, Component component, OnPress onPress) {
+        super(i, j, k, l, component, onPress, Supplier::get);
     }
     
     @Override
@@ -24,14 +26,14 @@ public class ConfigButtonWidget extends Button {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        this.blit(matrices, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
-        this.blit(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+        this.blit(matrices, this.getX(), this.getY(), 0, 46 + i * 20, this.width / 2, this.height);
+        this.blit(matrices, this.getX() + this.width / 2, this.getY(), 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
         this.renderBg(matrices, minecraftClient, mouseX, mouseY);
         int j = this.active ? 16777215 : 10526880;
         matrices.pushPose();
         float scale = 1 / 1.3f;
         matrices.scale(scale, scale, 0);
-        textRenderer.drawShadow(matrices, this.getMessage(), (this.x + this.width / 2) * (1 / scale) - textRenderer.width(getMessage()) / 2, (this.y + (this.height - 6) / 2) * (1 / scale), j | Mth.ceil(this.alpha * 255.0F) << 24);
+        textRenderer.drawShadow(matrices, this.getMessage(), (this.getX() + this.width / 2) * (1 / scale) - textRenderer.width(getMessage()) / 2, (this.getY() + (this.height - 6) / 2) * (1 / scale), j | Mth.ceil(this.alpha * 255.0F) << 24);
         matrices.popPose();
     }
 }

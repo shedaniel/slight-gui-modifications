@@ -40,7 +40,7 @@ public abstract class MixinChatScreen extends Screen implements AnimationListene
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;signer()Lnet/minecraft/util/Signer;"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;getMessageTagAt(DD)Lnet/minecraft/client/GuiMessageTag;"))
     private void postRenderCommandSuggestor(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.offset = -1;
     }

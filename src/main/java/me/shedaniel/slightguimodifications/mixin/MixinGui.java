@@ -6,7 +6,6 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import net.minecraft.client.Minecraft;
@@ -18,6 +17,7 @@ import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -110,7 +110,7 @@ public class MixinGui extends GuiComponent {
                     TextureAtlasSprite sprite = statusEffectSpriteManager.get(statusEffect);
                     list.add(() -> {
                         if (alpha[0] <= 0.01) return;
-                        RenderSystem.setShaderTexture(0, sprite.atlas().location());
+                        RenderSystem.setShaderTexture(0, sprite.atlasLocation());
                         matrices.pushPose();
                         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha[0]);
                         matrices.translate(x[0] - this.screenWidth, 0, 0);
@@ -124,7 +124,7 @@ public class MixinGui extends GuiComponent {
             
             RenderSystem.clear(256, Minecraft.ON_OSX);
             Window window = minecraft.getWindow();
-            Matrix4f matrix4f = Matrix4f.orthographic(0.0F, (float) (window.getWidth() / window.getGuiScale()), 0.0F, (float) (window.getHeight() / window.getGuiScale()), 1000.0F, 3000.0F);
+            Matrix4f matrix4f = new Matrix4f().setOrtho(0.0F, (float) (window.getWidth() / window.getGuiScale()), 0.0F, (float) (window.getHeight() / window.getGuiScale()), 1000.0F, 3000.0F);
             RenderSystem.setProjectionMatrix(matrix4f);
             PoseStack poseStack = RenderSystem.getModelViewStack();
             poseStack.setIdentity();

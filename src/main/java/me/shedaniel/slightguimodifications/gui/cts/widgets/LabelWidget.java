@@ -35,23 +35,23 @@ public class LabelWidget extends AbstractWidget {
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         int j = isMouseOver(mouseX, mouseY) ? hoveredColor : color;
-        int x = this.x;
+        int x = this.getX();
         if (alignment == 1) {
             x -= textRenderer.width(getMessage()) / 2;
         } else if (alignment == 2) {
             x -= textRenderer.width(getMessage());
         }
-        if (!hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.y, j | Mth.ceil(this.alpha * 255.0F) << 24);
-        else textRenderer.drawShadow(matrices, this.getMessage(), x, this.y, j | Mth.ceil(this.alpha * 255.0F) << 24);
+        if (!hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24);
+        else textRenderer.drawShadow(matrices, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24);
     }
     
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
         Minecraft minecraftClient = Minecraft.getInstance();
         Font textRenderer = minecraftClient.font;
-        if (mouseY < y || mouseY > y + textRenderer.lineHeight) return false;
+        if (mouseY < getY() || mouseY > getY() + textRenderer.lineHeight) return false;
         int width = textRenderer.width(getMessage());
-        int x = this.x;
+        int x = this.getX();
         if (alignment == 1) {
             x -= width / 2;
         } else if (alignment == 2) {
@@ -81,7 +81,7 @@ public class LabelWidget extends AbstractWidget {
     }
     
     @Override
-    public void updateNarration(NarrationElementOutput output) {
+    public void updateWidgetNarration(NarrationElementOutput output) {
         output.add(NarratedElementType.TITLE, getMessage());
     }
 }

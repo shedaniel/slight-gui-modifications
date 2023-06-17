@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +35,7 @@ public class MixinGameRenderer {
     @Unique private long endFps = 0;
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V",
                      ordinal = 0))
     private void preRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         Screen screen = minecraft.screen;
@@ -45,7 +44,7 @@ public class MixinGameRenderer {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", ordinal = 0,
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", ordinal = 0,
                      shift = At.Shift.AFTER))
     private void postRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
         Screen screen = minecraft.screen;
@@ -156,7 +155,7 @@ public class MixinGameRenderer {
     }
     
     @ModifyArg(method = "render",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V",
                         ordinal = 0),
                index = 1)
     private int transformScreenRenderMouseY(int mouseY) {

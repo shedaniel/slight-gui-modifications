@@ -3,7 +3,6 @@ package me.shedaniel.slightguimodifications.mixin;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import me.shedaniel.math.Point;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
@@ -15,11 +14,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.List;
 
 @Mixin(EditBox.class)
-public abstract class MixinEditBox extends AbstractWidget implements Widget, GuiEventListener {
+public abstract class MixinEditBox extends AbstractWidget implements Renderable, GuiEventListener {
     @Shadow private boolean isEditable;
     
     @Shadow private int textColor;
@@ -106,6 +106,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
         // 9 Patch Texture
         
         // Four Corners
+        int x = getX(), y = getY();
         blit(lastMatrices, x - 1, y - 1, getBlitOffset(), 0, 0, 8, 8, 256, 256);
         blit(lastMatrices, x + width - 7, y - 1, getBlitOffset(), 248, 0, 8, 8, 256, 256);
         blit(lastMatrices, x - 1, y + height - 7, getBlitOffset(), 0, 248, 8, 8, 256, 256);
@@ -158,12 +159,12 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
             y2 = tmp;
         }
         
-        if (x2 > this.x + this.width) {
-            x2 = this.x + this.width;
+        if (x2 > this.getX() + this.width) {
+            x2 = this.getX() + this.width;
         }
         
-        if (x1 > this.x + this.width) {
-            x1 = this.x + this.width;
+        if (x1 > this.getX() + this.width) {
+            x1 = this.getX() + this.width;
         }
         
         int color = this.isEditable ? this.textColor : this.textColorUneditable;
@@ -205,7 +206,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Widget, Gui
                 }
             }
             cir.setReturnValue(true);
-            boolean boolean_1 = mouseX >= (double) this.x && mouseX < (double) (this.x + this.width) && mouseY >= (double) this.y && mouseY < (double) (this.y + this.height);
+            boolean boolean_1 = mouseX >= (double) this.getX() && mouseX < (double) (this.getX() + this.width) && mouseY >= (double) this.getY() && mouseY < (double) (this.getY() + this.height);
             if (this.canLoseFocus) {
                 this.setFocused(boolean_1);
             }

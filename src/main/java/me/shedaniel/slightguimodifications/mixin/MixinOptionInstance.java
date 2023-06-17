@@ -2,9 +2,7 @@ package me.shedaniel.slightguimodifications.mixin;
 
 import com.mojang.serialization.Codec;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
-import me.shedaniel.slightguimodifications.listener.ClampingLazyMaxIntRangeListener;
 import me.shedaniel.slightguimodifications.listener.CoolOptionInstanceSliderButton;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -29,11 +27,11 @@ public abstract class MixinOptionInstance<T> {
     @Mutable @Shadow @Final Function<T, Component> toString;
     
     
-    @Shadow @Final private OptionInstance.TooltipSupplierFactory<T> tooltip;
+    @Shadow @Final private OptionInstance.TooltipSupplier<T> tooltip;
     
-    @Inject(method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplierFactory;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V",
+    @Inject(method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V",
             at = @At("RETURN"))
-    private void init(String string, OptionInstance.TooltipSupplierFactory tooltipSupplierFactory, OptionInstance.CaptionBasedToString captionBasedToString, OptionInstance.ValueSet valueSet, Codec codec, Object object, Consumer consumer, CallbackInfo ci) {
+    private void init(String string, OptionInstance.TooltipSupplier tooltipSupplierFactory, OptionInstance.CaptionBasedToString captionBasedToString, OptionInstance.ValueSet valueSet, Codec codec, Object object, Consumer consumer, CallbackInfo ci) {
         if (string.equals("options.guiScale")) {
             Function<T, Component> toString1 = this.toString;
             this.toString = (t) -> {
@@ -45,12 +43,12 @@ public abstract class MixinOptionInstance<T> {
     @Inject(method = "createButton", at = @At("HEAD"), cancellable = true)
     private void createButton(Options options, int x, int y, int width, CallbackInfoReturnable<AbstractWidget> cir) {
         OptionInstance<T> optionInstance = (OptionInstance<T>) (Object) this;
-        if (SlightGuiModifications.getGuiConfig().customScaling.vanillaScaleSlider && optionInstance == options.guiScale()) {
-            OptionInstance.TooltipSupplier<Integer> tooltipSupplier = (OptionInstance.TooltipSupplier<Integer>) this.tooltip.apply(Minecraft.getInstance());
+        if (SlightGuiModifications.getGuiConfig().customScaling.modifyVanillaScaleSlider && optionInstance == options.guiScale()) {
+            OptionInstance.TooltipSupplier<Integer> tooltipSupplier = (OptionInstance.TooltipSupplier<Integer>) this.tooltip;
             OptionInstance.ClampingLazyMaxIntRange range = (OptionInstance.ClampingLazyMaxIntRange) this.values;
             range = new OptionInstance.ClampingLazyMaxIntRange(range.minInclusive(), range.maxSupplier());
             cir.setReturnValue(
-                    new CoolOptionInstanceSliderButton(options, x, y, width, 20, optionInstance, range, tooltipSupplier));
+                    new CoolOptionInstanceSliderButton(options, x, y, width, 20, optionInstance, range, tooltipSupplier, $ -> {}));
         }
     }
 }

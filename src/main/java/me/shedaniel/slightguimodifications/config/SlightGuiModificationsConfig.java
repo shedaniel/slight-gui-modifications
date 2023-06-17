@@ -110,7 +110,7 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         }
         
         public static class CustomScaling {
-            public boolean vanillaScaleSlider = false;
+            public boolean modifyVanillaScaleSlider = true;
             @ScaleSlider
             public double scale = 1;
         }

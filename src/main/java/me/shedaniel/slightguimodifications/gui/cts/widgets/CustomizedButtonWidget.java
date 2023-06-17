@@ -16,7 +16,7 @@ public class CustomizedButtonWidget extends Button {
     private final Supplier<ResourceLocation> hoveredTexture;
     
     public CustomizedButtonWidget(int x, int y, int width, int height, Component message, OnPress onPress, Supplier<ResourceLocation> texture, Supplier<ResourceLocation> hoveredTexture) {
-        super(x, y, width, height, message, onPress);
+        super(x, y, width, height, message, onPress, Supplier::get);
         this.texture = texture;
         this.hoveredTexture = hoveredTexture;
     }
@@ -35,13 +35,10 @@ public class CustomizedButtonWidget extends Button {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
-            innerBlit(matrices.last().pose(), x, x + width, y, y + height, getBlitOffset(), 0F, 1F, 0F, 1F);
+            innerBlit(matrices.last().pose(), getX(), getX() + width, getY(), getY() + height, getBlitOffset(), 0F, 1F, 0F, 1F);
             this.renderBg(matrices, minecraftClient, mouseX, mouseY);
             int j = this.active ? 16777215 : 10526880;
-            drawCenteredString(matrices, textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
-            if (this.isHoveredOrFocused()) {
-                this.renderToolTip(matrices, mouseX, mouseY);
-            }
+            drawCenteredString(matrices, textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
             return;
         }
         super.renderButton(matrices, mouseX, mouseY, delta);

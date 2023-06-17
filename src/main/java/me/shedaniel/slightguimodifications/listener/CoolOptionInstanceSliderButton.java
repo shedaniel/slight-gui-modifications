@@ -7,13 +7,16 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.util.Mth;
 
+import java.util.function.Consumer;
+
 public class CoolOptionInstanceSliderButton<T> extends OptionInstance.OptionInstanceSliderButton<T> {
     private final OptionInstance<T> instance;
     private final OptionInstance.SliderableValueSet<T> sliderableValueSet;
     private long lastActive = -1;
     
-    public CoolOptionInstanceSliderButton(Options options, int i, int j, int k, int l, OptionInstance<T> instance, OptionInstance.SliderableValueSet<T> sliderableValueSet, OptionInstance.TooltipSupplier<T> tooltipSupplier) {
-        super(options, i, j, k, l, instance, sliderableValueSet, tooltipSupplier);
+    public CoolOptionInstanceSliderButton(Options options, int i, int j, int k, int l, OptionInstance<T> instance, OptionInstance.SliderableValueSet<T> sliderableValueSet, OptionInstance.TooltipSupplier<T> tooltipSupplier,
+                                          Consumer<T> onValueChanged) {
+        super(options, i, j, k, l, instance, sliderableValueSet, tooltipSupplier, onValueChanged);
         this.instance = instance;
         this.sliderableValueSet = sliderableValueSet;
     }
