@@ -5,12 +5,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LabelWidget extends AbstractWidget {
     private int alignment, color, hoveredColor;
@@ -27,7 +30,7 @@ public class LabelWidget extends AbstractWidget {
     }
     
     @Override
-    public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
         Minecraft minecraftClient = Minecraft.getInstance();
         Font textRenderer = minecraftClient.font;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
@@ -60,9 +63,10 @@ public class LabelWidget extends AbstractWidget {
         return !(mouseX < x) && !(mouseX > x + width);
     }
     
+    @Nullable
     @Override
-    public boolean changeFocus(boolean bl) {
-        return false;
+    public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
+        return null;
     }
     
     @Override

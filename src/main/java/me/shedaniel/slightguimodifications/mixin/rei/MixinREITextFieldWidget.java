@@ -90,28 +90,20 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
         // 9 Patch Texture
         
         // Four Corners
-        blit(matrices, x - 1, y - 1, getBlitOffset(), 0, 0, 8, 8, 256, 256);
-        blit(matrices, x + width - 7, y - 1, getBlitOffset(), 248, 0, 8, 8, 256, 256);
-        blit(matrices, x - 1, y + height - 7, getBlitOffset(), 0, 248, 8, 8, 256, 256);
-        blit(matrices, x + width - 7, y + height - 7, getBlitOffset(), 248, 248, 8, 8, 256, 256);
+        blit(matrices, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
+        blit(matrices, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
+        blit(matrices, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
+        blit(matrices, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
         
         Matrix4f matrix = matrices.last().pose();
         // Sides
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, getBlitOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, getBlitOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, getBlitOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, getBlitOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, getBlitOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
-    }
-    
-    @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
-                        ordinal = 0),
-               index = 5)
-    private int modifyBorderHighlightedColor(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
     }
     
     @ModifyArg(method = "renderBorder",
@@ -124,9 +116,17 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
-                        ordinal = 2),
+                        ordinal = 0),
                index = 5)
     private int modifyBackgroundColor(int color) {
+        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
+    }
+    
+    @ModifyArg(method = "renderBorder",
+            at = @At(value = "INVOKE", target = "Lme/shedaniel/rei/impl/client/gui/widget/basewidgets/TextFieldWidget;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+                    ordinal = 2),
+            index = 5)
+    private int modifyBackgroundColor2(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     

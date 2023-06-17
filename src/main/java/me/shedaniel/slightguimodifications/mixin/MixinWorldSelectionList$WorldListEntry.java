@@ -37,7 +37,6 @@ public abstract class MixinWorldSelectionList$WorldListEntry {
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (SlightGuiModifications.getGuiConfig().rightClickActions && button == 1) {
             screen.list.setSelected((WorldSelectionList.WorldListEntry) (Object) this);
-            this.screen.updateButtonStatus(screen.list.getSelectedOpt().isPresent());
             ((MenuWidgetListener) screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2),
                     ImmutableList.of(
                             new TextMenuEntry(I18n.get("selectWorld.delete"), () -> {

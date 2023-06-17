@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Font.class)
 public abstract class MixinTextRenderer {
-    @ModifyVariable(method = "renderText(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;ZII)F",
+    @ModifyVariable(method = "renderText(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)F",
                     ordinal = 0, at = @At("HEAD"))
     private int drawLayerStringChangeColor(int color) {
         Screen screen = Minecraft.getInstance().screen;
@@ -25,7 +25,7 @@ public abstract class MixinTextRenderer {
     }
     
     @ModifyVariable(
-            method = "renderText(Lnet/minecraft/util/FormattedCharSequence;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;ZII)F",
+            method = "renderText(Lnet/minecraft/util/FormattedCharSequence;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)F",
             ordinal = 0, at = @At("HEAD"))
     private int drawLayerStringRenderableChangeColor(int color) {
         Screen screen = Minecraft.getInstance().screen;

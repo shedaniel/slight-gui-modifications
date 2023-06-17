@@ -54,6 +54,12 @@ public class MixinGameRenderer {
     
     @Inject(method = "render", at = @At("RETURN"))
     private void postRenderEverything(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        PoseStack poseStack = RenderSystem.getModelViewStack();
+        poseStack.pushPose();
+        poseStack.setIdentity();
+        poseStack.translate(0.0F, 0.0F, -2000.0F);
+        RenderSystem.applyModelViewMatrix();
+        
         PoseStack matrices = new PoseStack();
         ResourceLocation lastPrettyScreenshotTextureId = SlightGuiModifications.lastPrettyScreenshotTextureId;
         if (lastPrettyScreenshotTextureId != null) {
@@ -147,6 +153,9 @@ public class MixinGameRenderer {
                 matrices.popPose();
             }
         }
+        
+        poseStack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
     
     @Inject(method = "render", at = @At("HEAD"))

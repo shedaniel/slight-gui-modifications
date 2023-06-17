@@ -46,7 +46,7 @@ public abstract class MixinOptionInstance<T> {
         if (SlightGuiModifications.getGuiConfig().customScaling.modifyVanillaScaleSlider && optionInstance == options.guiScale()) {
             OptionInstance.TooltipSupplier<Integer> tooltipSupplier = (OptionInstance.TooltipSupplier<Integer>) this.tooltip;
             OptionInstance.ClampingLazyMaxIntRange range = (OptionInstance.ClampingLazyMaxIntRange) this.values;
-            range = new OptionInstance.ClampingLazyMaxIntRange(range.minInclusive(), range.maxSupplier());
+            range = new OptionInstance.ClampingLazyMaxIntRange(range.minInclusive(), range.maxSupplier(), range.encodableMaxInclusive());
             cir.setReturnValue(
                     new CoolOptionInstanceSliderButton(options, x, y, width, 20, optionInstance, range, tooltipSupplier, $ -> {}));
         }

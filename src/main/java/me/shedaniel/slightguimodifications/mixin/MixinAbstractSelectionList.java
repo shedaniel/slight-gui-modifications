@@ -30,7 +30,7 @@ public class MixinAbstractSelectionList {
 //    }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractSelectionList;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIFFIIII)V"))
     private void preBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
@@ -40,7 +40,7 @@ public class MixinAbstractSelectionList {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractSelectionList;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIFFIIII)V", shift = At.Shift.AFTER))
     private void postBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.popMatrix();
     }

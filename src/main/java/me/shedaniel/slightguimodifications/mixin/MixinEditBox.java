@@ -29,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
@@ -81,12 +80,12 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     @Unique
     private PoseStack lastMatrices;
     
-    @Inject(method = "renderButton", at = @At("HEAD"))
+    @Inject(method = "renderWidget", at = @At("HEAD"))
     private void preRenderButton(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.lastMatrices = matrices;
     }
     
-    @Redirect(method = "renderButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z", ordinal = 0))
+    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z", ordinal = 0))
     private boolean isBordered(EditBox textFieldWidget) {
         boolean border = isBordered();
         if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
@@ -107,24 +106,24 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
         
         // Four Corners
         int x = getX(), y = getY();
-        blit(lastMatrices, x - 1, y - 1, getBlitOffset(), 0, 0, 8, 8, 256, 256);
-        blit(lastMatrices, x + width - 7, y - 1, getBlitOffset(), 248, 0, 8, 8, 256, 256);
-        blit(lastMatrices, x - 1, y + height - 7, getBlitOffset(), 0, 248, 8, 8, 256, 256);
-        blit(lastMatrices, x + width - 7, y + height - 7, getBlitOffset(), 248, 248, 8, 8, 256, 256);
+        blit(lastMatrices, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
+        blit(lastMatrices, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
+        blit(lastMatrices, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
+        blit(lastMatrices, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
         
         Matrix4f matrix = lastMatrices.last().pose();
         // Sides
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, getBlitOffset(), (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, getBlitOffset(), (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, getBlitOffset(), (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, getBlitOffset(), (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, getBlitOffset(), (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
         this.lastMatrices = null;
     }
     
-    @ModifyArg(method = "renderButton",
+    @ModifyArg(method = "renderWidget",
                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 0),
                index = 5)
@@ -132,7 +131,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
-    @ModifyArg(method = "renderButton",
+    @ModifyArg(method = "renderWidget",
                at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
                         ordinal = 1),
                index = 5)
@@ -140,9 +139,8 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     
-    @Inject(method = "renderHighlight", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", remap = false, ordinal = 0),
-            cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
-    private void drawSelectionHighlight(int x1, int y1, int x2, int y2, CallbackInfo ci, Tesselator tessellator, BufferBuilder buffer) {
+    @Inject(method = "renderHighlight", at = @At("HEAD"), cancellable = true)
+    private void drawSelectionHighlight(PoseStack poseStack, int x1, int y1, int x2, int y2, CallbackInfo ci) {
         if (!SlightGuiModifications.getGuiConfig().textFieldModifications.enabled || SlightGuiModifications.getGuiConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.Gui.TextFieldModifications.SelectionMode.HIGHLIGHT)
             return;
         ci.cancel();
@@ -171,22 +169,22 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
         int r = (color >> 16 & 255);
         int g = (color >> 8 & 255);
         int b = (color & 255);
-        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
 //        RenderSystem.disableAlphaTest();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
 //        RenderSystem.shadeModel(7425);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder buffer = tessellator.getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(x1, y2, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
-        buffer.vertex(x2, y2, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
-        buffer.vertex(x2, y1, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
-        buffer.vertex(x1, y1, getBlitOffset() + 50d).color(r, g, b, 120).endVertex();
+        buffer.vertex(x1, y2, 0 + 50d).color(r, g, b, 120).endVertex();
+        buffer.vertex(x2, y2, 0 + 50d).color(r, g, b, 120).endVertex();
+        buffer.vertex(x2, y1, 0 + 50d).color(r, g, b, 120).endVertex();
+        buffer.vertex(x1, y1, 0 + 50d).color(r, g, b, 120).endVertex();
         tessellator.end();
 //        RenderSystem.shadeModel(7424);
         RenderSystem.disableBlend();
 //        RenderSystem.enableAlphaTest();
-        RenderSystem.enableTexture();
     }
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

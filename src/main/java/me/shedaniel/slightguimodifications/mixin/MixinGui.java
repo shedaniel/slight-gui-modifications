@@ -114,7 +114,7 @@ public class MixinGui extends GuiComponent {
                         matrices.pushPose();
                         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha[0]);
                         matrices.translate(x[0] - this.screenWidth, 0, 0);
-                        blit(matrices, this.screenWidth + 3, y[0] + 3, this.getBlitOffset(), 18, 18, sprite);
+                        blit(matrices, this.screenWidth + 3, y[0] + 3, 0, 18, 18, sprite);
                         matrices.popPose();
                     });
                 }

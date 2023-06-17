@@ -146,9 +146,9 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
         this.currentFade = currentFade;
     }
     
-    @Redirect(method = "renderBackground(Lcom/mojang/blaze3d/vertex/PoseStack;I)V",
+    @Redirect(method = "renderBackground",
               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V"))
-    private void fillGradient(Screen screen, PoseStack matrices, int top, int left, int right, int bottom, int color1, int color2) {
+    private void fillGradientRedirect(PoseStack matrices, int top, int left, int right, int bottom, int color1, int color2) {
         if (this.renderingState == 2) {
             float alpha = slightguimodifications_getEasedYOffset();
             this.renderingState = 0;
@@ -165,16 +165,16 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     
     
     @Inject(method = "renderDirtBackground",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V", ordinal = 0))
-    private void preRenderDirtBackground(int alpha, CallbackInfo ci) {
+            at = @At(value = "HEAD"))
+    private void preRenderDirtBackground(PoseStack poseStack, CallbackInfo ci) {
         if (this.renderingState == 2) {
             this.renderingState = 0;
         }
     }
     
     @Inject(method = "renderDirtBackground",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", ordinal = 0))
-    private void postRenderDirtBackground(int alpha, CallbackInfo ci) {
+            at = @At("RETURN"))
+    private void postRenderDirtBackground(PoseStack poseStack, CallbackInfo ci) {
         this.renderingState = 2;
     }
     

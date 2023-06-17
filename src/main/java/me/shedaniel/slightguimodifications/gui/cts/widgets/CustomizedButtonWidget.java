@@ -22,7 +22,7 @@ public class CustomizedButtonWidget extends Button {
     }
     
     @Override
-    public void renderButton(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
         ResourceLocation textureId = texture.get();
         if (textureId != null) {
             ResourceLocation hoveredTextureId = hoveredTexture.get();
@@ -35,12 +35,23 @@ public class CustomizedButtonWidget extends Button {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
-            innerBlit(matrices.last().pose(), getX(), getX() + width, getY(), getY() + height, getBlitOffset(), 0F, 1F, 0F, 1F);
-            this.renderBg(matrices, minecraftClient, mouseX, mouseY);
+            blitNineSliced(matrices, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, this.getTextureY());
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             int j = this.active ? 16777215 : 10526880;
             drawCenteredString(matrices, textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
             return;
         }
-        super.renderButton(matrices, mouseX, mouseY, delta);
+        super.renderWidget(matrices, mouseX, mouseY, delta);
+    }
+    
+    private int getTextureY() {
+        int i = 1;
+        if (!this.active) {
+            i = 0;
+        } else if (this.isHoveredOrFocused()) {
+            i = 2;
+        }
+        
+        return 46 + i * 20;
     }
 }
