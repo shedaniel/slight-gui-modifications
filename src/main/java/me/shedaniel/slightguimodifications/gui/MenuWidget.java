@@ -8,6 +8,7 @@ import me.shedaniel.clothconfig2.api.ScrollingContainer;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import org.jetbrains.annotations.NotNull;
@@ -66,11 +67,11 @@ public class MenuWidget extends AbstractContainerEventHandler implements Rendera
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Rectangle bounds = getBounds();
         Rectangle innerBounds = getInnerBounds();
-        fill(matrices, bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), -6250336);
-        fill(matrices, innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), -16777216);
+        graphics.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), -6250336);
+        graphics.fill(innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), -16777216);
         boolean contains = innerBounds.contains(mouseX, mouseY);
         MenuEntry focused = getFocused() instanceof MenuEntry ? (MenuEntry) getFocused() : null;
         int currentY = (int) (innerBounds.y - scrolling.scrollAmount);
@@ -85,12 +86,12 @@ public class MenuWidget extends AbstractContainerEventHandler implements Rendera
             boolean rendering = currentY + child.getEntryHeight() >= innerBounds.y && currentY <= innerBounds.getMaxY();
             boolean containsMouse = contains && mouseY >= currentY && mouseY < currentY + child.getEntryHeight();
             child.updateInformation(innerBounds.x, currentY, focused == child || containsMouse, containsMouse, rendering, getMaxEntryWidth());
-            if (rendering) child.render(matrices, mouseX, mouseY, delta);
+            if (rendering) child.render(graphics, mouseX, mouseY, delta);
             currentY += child.getEntryHeight();
         }
         ScissorsHandler.INSTANCE.removeLastScissor();
         setFocused(focused);
-        scrolling.renderScrollBar();
+        scrolling.renderScrollBar(graphics);
         scrolling.updatePosition(delta);
     }
     

@@ -4,14 +4,13 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -58,12 +57,12 @@ public class Cts {
             return 0;
         }
         
-        public abstract void render(PoseStack matrices, TitleScreen screen, float delta, float alpha);
+        public abstract void render(GuiGraphics graphics, TitleScreen screen, float delta, float alpha);
     }
     
     public static class DefaultBackgroundInfo extends BackgroundInfo {
         @Override
-        public void render(PoseStack matrices, TitleScreen screen, float delta, float alpha) {
+        public void render(GuiGraphics graphics, TitleScreen screen, float delta, float alpha) {
             RenderSystem.setShaderTexture(0, TitleScreen.PANORAMA_OVERLAY);
             screen.panorama.render(delta, Mth.clamp(alpha * getAlpha(), 0.0F, 1.0F));
         }
@@ -77,12 +76,11 @@ public class Cts {
         }
         
         @Override
-        public void render(PoseStack matrices, TitleScreen screen, float delta, float alpha) {
-            RenderSystem.setShaderTexture(0, provider.get());
+        public void render(GuiGraphics graphics, TitleScreen screen, float delta, float alpha) {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, getAlpha());
-            GuiComponent.blit(matrices, 0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
+            graphics.blit(provider.get(), 0, 0, screen.width, screen.height, 0.0F, 0.0F, 16, 128, 16, 128);
         }
     }
     

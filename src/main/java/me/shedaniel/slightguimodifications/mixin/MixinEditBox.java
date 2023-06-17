@@ -11,7 +11,7 @@ import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -19,7 +19,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import org.joml.Matrix4f;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -78,11 +78,11 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     public abstract boolean isMouseOver(double mouseX, double mouseY);
     
     @Unique
-    private PoseStack lastMatrices;
+    private GuiGraphics lastMatrices;
     
     @Inject(method = "renderWidget", at = @At("HEAD"))
-    private void preRenderButton(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.lastMatrices = matrices;
+    private void preRenderButton(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.lastMatrices = graphics;
     }
     
     @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z", ordinal = 0))
@@ -97,7 +97,8 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     
     @Unique
     private void renderTextureBorder() {
-        RenderSystem.setShaderTexture(0, SlightGuiModifications.TEXT_FIELD_TEXTURE);
+        ResourceLocation texture = SlightGuiModifications.TEXT_FIELD_TEXTURE;
+        RenderSystem.setShaderTexture(0, texture);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
@@ -106,41 +107,40 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
         
         // Four Corners
         int x = getX(), y = getY();
-        blit(lastMatrices, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
-        blit(lastMatrices, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
-        blit(lastMatrices, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
-        blit(lastMatrices, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
+        lastMatrices.blit(texture, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
+        lastMatrices.blit(texture, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
+        lastMatrices.blit(texture, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
+        lastMatrices.blit(texture, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
         
-        Matrix4f matrix = lastMatrices.last().pose();
         // Sides
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        lastMatrices.innerBlit(texture, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        lastMatrices.innerBlit(texture, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
         this.lastMatrices = null;
     }
     
     @ModifyArg(method = "renderWidget",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
                         ordinal = 0),
-               index = 5)
+               index = 4)
     private int modifyBorderColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
     }
     
     @ModifyArg(method = "renderWidget",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
                         ordinal = 1),
-               index = 5)
+               index = 4)
     private int modifyBackgroundColor(int color) {
         return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
     }
     
     @Inject(method = "renderHighlight", at = @At("HEAD"), cancellable = true)
-    private void drawSelectionHighlight(PoseStack poseStack, int x1, int y1, int x2, int y2, CallbackInfo ci) {
+    private void drawSelectionHighlight(GuiGraphics graphics, int x1, int y1, int x2, int y2, CallbackInfo ci) {
         if (!SlightGuiModifications.getGuiConfig().textFieldModifications.enabled || SlightGuiModifications.getGuiConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.Gui.TextFieldModifications.SelectionMode.HIGHLIGHT)
             return;
         ci.cancel();
@@ -187,8 +187,16 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
 //        RenderSystem.enableAlphaTest();
     }
     
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (preMouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+    
+    private boolean preMouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1) {
             if (isEditable()) {
                 if (cursorPos - highlightPos != 0) {
@@ -203,12 +211,14 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
                     ((MenuWidgetListener) Minecraft.getInstance().screen).applyMenu(new MenuWidget(new Point(mouseX + 2, mouseY + 2), createNonSelectingNotEditableMenu()));
                 }
             }
-            cir.setReturnValue(true);
             boolean boolean_1 = mouseX >= (double) this.getX() && mouseX < (double) (this.getX() + this.width) && mouseY >= (double) this.getY() && mouseY < (double) (this.getY() + this.height);
             if (this.canLoseFocus) {
                 this.setFocused(boolean_1);
             }
+            return true;
         }
+        
+        return false;
     }
     
     @Unique

@@ -15,9 +15,8 @@ public class MixinAbstractWidget {
     private static final ResourceLocation US_WIDGETS_LOCATION = new ResourceLocation("textures/gui/widgets_original.png");
     
     @ModifyArg(method = "renderWidget",
-               at = @At(value = "FIELD",
-                        target = "Lnet/minecraft/client/gui/components/AbstractButton;WIDGETS_LOCATION:Lnet/minecraft/resources/ResourceLocation;",
-                        shift = At.Shift.AFTER))
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/client/gui/GuiGraphics;blitNineSliced(Lnet/minecraft/resources/ResourceLocation;IIIIIIIIII)V"))
     private ResourceLocation modifyId(ResourceLocation id) {
         if ((Object) this instanceof MerchantScreen.TradeOfferButton && id == AbstractWidget.WIDGETS_LOCATION) {
             return US_WIDGETS_LOCATION;

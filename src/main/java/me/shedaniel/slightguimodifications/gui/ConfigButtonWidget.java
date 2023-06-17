@@ -2,9 +2,9 @@ package me.shedaniel.slightguimodifications.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -17,7 +17,7 @@ public class ConfigButtonWidget extends Button {
     }
     
     @Override
-    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraftClient = Minecraft.getInstance();
         Font textRenderer = minecraftClient.font;
         RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
@@ -25,14 +25,14 @@ public class ConfigButtonWidget extends Button {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        blitNineSliced(matrices, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, this.getTextureY());
+        graphics.blitNineSliced(WIDGETS_LOCATION, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, this.getTextureY());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int j = this.active ? 16777215 : 10526880;
-        matrices.pushPose();
+        graphics.pose().pushPose();
         float scale = 1 / 1.3f;
-        matrices.scale(scale, scale, 0);
-        textRenderer.drawShadow(matrices, this.getMessage(), (this.getX() + this.width / 2) * (1 / scale) - textRenderer.width(getMessage()) / 2, (this.getY() + (this.height - 6) / 2) * (1 / scale), j | Mth.ceil(this.alpha * 255.0F) << 24);
-        matrices.popPose();
+        graphics.pose().scale(scale, scale, 0);
+        graphics.drawString(textRenderer, this.getMessage(), (int) ((this.getX() + this.width / 2) * (1 / scale) - textRenderer.width(getMessage()) / 2), (int) ((this.getY() + (this.height - 6) / 2) * (1 / scale)), j | Mth.ceil(this.alpha * 255.0F) << 24);
+        graphics.pose().popPose();
     }
     
     private int getTextureY() {

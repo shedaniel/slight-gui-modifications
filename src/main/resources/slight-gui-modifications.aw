@@ -8,7 +8,7 @@ accessible field net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScr
 accessible method net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen editServerCallback (Z)V
 accessible method net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen deleteCallback (Z)V
 accessible field com/mojang/blaze3d/platform/NativeImage useStbFree Z
-accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lorg/joml/Matrix4f;IIIIIFFFF)V
+accessible method net/minecraft/client/gui/GuiGraphics innerBlit (Lnet/minecraft/resources/ResourceLocation;IIIIIFFFF)V
 accessible field net/minecraft/client/gui/screens/TitleScreen panorama Lnet/minecraft/client/renderer/PanoramaRenderer;
 accessible field net/minecraft/client/gui/screens/TitleScreen PANORAMA_OVERLAY Lnet/minecraft/resources/ResourceLocation;
 accessible class net/minecraft/client/gui/components/toasts/ToastComponent$ToastInstance

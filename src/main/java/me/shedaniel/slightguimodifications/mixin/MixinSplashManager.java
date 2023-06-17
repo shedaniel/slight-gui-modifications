@@ -3,6 +3,7 @@ package me.shedaniel.slightguimodifications.mixin;
 import com.google.common.collect.Lists;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.Cts;
+import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.resources.SplashManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -44,11 +45,11 @@ public class MixinSplashManager {
     }
     
     @Inject(method = "getSplash", at = @At("HEAD"), cancellable = true)
-    private void preGet(CallbackInfoReturnable<String> cir) {
+    private void preGet(CallbackInfoReturnable<SplashRenderer> cir) {
         Cts config = SlightGuiModifications.getCtsConfig();
         if (config.enabled && config.splashText.enabled) {
             if (config.splashText.removeSplashes) {
-                cir.setReturnValue("");
+                cir.setReturnValue(null);
                 return;
             }
         }

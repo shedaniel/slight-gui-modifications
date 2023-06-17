@@ -1,23 +1,20 @@
 package me.shedaniel.slightguimodifications.mixin;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.hooks.client.screen.ScreenHooks;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.Cts;
 import me.shedaniel.slightguimodifications.gui.cts.elements.WidgetElement;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
-import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,15 +39,15 @@ public abstract class MixinTitleScreen extends Screen {
     public abstract boolean shouldCloseOnEsc();
     
     @Unique
-    private PoseStack lastMatrices;
+    private GuiGraphics lastMatrices;
     
     protected MixinTitleScreen(Component title) {
         super(title);
     }
     
     @Inject(method = "render", at = @At("HEAD"))
-    private void preRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        this.lastMatrices = matrices;
+    private void preRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.lastMatrices = graphics;
     }
     
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PanoramaRenderer;render(FF)V"))
@@ -59,7 +56,7 @@ public abstract class MixinTitleScreen extends Screen {
         if (!cts.enabled) {
             rotatingCubeMapRenderer.render(delta, alpha);
         } else {
-            fill(lastMatrices, 0, 0, this.width, this.height, 0xFF000000);
+            lastMatrices.fill(0, 0, this.width, this.height, 0xFF000000);
             int tmp = ((AnimationListener) this).slightguimodifications_getAnimationState();
             ((AnimationListener) this).slightguimodifications_setAnimationState(0);
             List<Cts.BackgroundInfo> list = Lists.newArrayList(cts.backgroundInfos);
@@ -75,12 +72,12 @@ public abstract class MixinTitleScreen extends Screen {
     }
     
     @Redirect(method = "render", at = @At(value = "INVOKE",
-                                          target = "Lnet/minecraft/client/gui/screens/TitleScreen;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIFFIIII)V"))
-    private void thing(PoseStack matrices, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int texWidth, int texHeight) {
+                                          target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIFFIIII)V"))
+    private void thing(GuiGraphics graphics, ResourceLocation los, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int texWidth, int texHeight) {
         if (!SlightGuiModifications.getCtsConfig().enabled || SlightGuiModifications.getCtsConfig().renderGradientShade) {
             int tmp = ((AnimationListener) this).slightguimodifications_getAnimationState();
             ((AnimationListener) this).slightguimodifications_setAnimationState(0);
-            GuiComponent.blit(matrices, x, y, width, height, u, v, uWidth, vHeight, texWidth, texHeight);
+            graphics.blit(los, x, y, width, height, u, v, uWidth, vHeight, texWidth, texHeight);
             ((AnimationListener) this).slightguimodifications_setAnimationState(tmp);
         }
     }
@@ -104,41 +101,17 @@ public abstract class MixinTitleScreen extends Screen {
     }
     
     @Inject(method = "render", at = @At("HEAD"))
-    private void generateRefmap(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-    }
-    
-    @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderColor(FFFF)V", remap = false, ordinal = 1,
-                     shift = At.Shift.AFTER))
-    private void preLogoRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (SlightGuiModifications.getCtsConfig().enabled && SlightGuiModifications.getCtsConfig().removeMinecraftEditionTexture)
-            RenderSystem.setShaderColor(1, 1, 1, 0);
-    }
-    
-    @Inject(method = "render",
-            at = {
-                    @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
-                        remap = false,
-                        ordinal = 2),
-                    @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/TitleScreen;warningLabel:Lnet/minecraft/client/gui/screens/TitleScreen$WarningLabel;",
-                        ordinal = 0)
-            })
-    private void preEditionRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (SlightGuiModifications.getCtsConfig().enabled)
-            if (SlightGuiModifications.getCtsConfig().removeMinecraftLogoTexture)
-                RenderSystem.setShaderColor(1, 1, 1, 0);
-            else
-                RenderSystem.setShaderColor(1, 1, 1, this.fading ? (float) Mth.ceil(Mth.clamp((float) (Util.getMillis() - this.fadeInStart) / 1000.0F, 0.0F, 1.0F)) : 1.0F);
+    private void generateRefmap(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
     }
     
     @Redirect(method = "render",
               at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/gui/screens/TitleScreen;drawString(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)V"))
-    private void stringRender(PoseStack matrices, Font textRenderer, String text, int x, int y, int color) {
+                       target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I"))
+    private int stringRender(GuiGraphics graphics, Font textRenderer, String text, int x, int y, int color) {
         if (SlightGuiModifications.getCtsConfig().enabled)
             if (SlightGuiModifications.getCtsConfig().clearAllLabels)
-                return;
-        GuiComponent.drawString(matrices, textRenderer, text, x, y, color);
+                return 0;
+        return graphics.drawString(textRenderer, text, x, y, color);
     }
     
     @Inject(method = "realmsNotificationsEnabled", at = @At("HEAD"), cancellable = true)

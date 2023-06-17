@@ -3,6 +3,7 @@ package me.shedaniel.slightguimodifications.mixin;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,8 +31,8 @@ public class MixinAbstractSelectionList {
 //    }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractSelectionList;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIFFIIII)V"))
-    private void preBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"))
+    private void preBufferDraw(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
 //        RenderSystem.disableAlphaTest();
@@ -40,8 +41,8 @@ public class MixinAbstractSelectionList {
     }
     
     @Inject(method = "render",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractSelectionList;blit(Lcom/mojang/blaze3d/vertex/PoseStack;IIFFIIII)V", shift = At.Shift.AFTER))
-    private void postBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V", shift = At.Shift.AFTER))
+    private void postBufferDraw(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.popMatrix();
     }
 }

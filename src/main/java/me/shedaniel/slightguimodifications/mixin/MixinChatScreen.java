@@ -5,6 +5,7 @@ import me.shedaniel.clothconfig2.impl.EasingMethod;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -35,13 +36,13 @@ public abstract class MixinChatScreen extends Screen implements AnimationListene
     }
     
     @Inject(method = "render", at = @At(value = "HEAD"))
-    private void preRender(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void preRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.offset = start == -1 ? -1 : Mth.clamp((Util.getMillis() - start) / 300, 0.0, 1.0);
     }
     
     @Inject(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;getMessageTagAt(DD)Lnet/minecraft/client/GuiMessageTag;"))
-    private void postRenderCommandSuggestor(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void postRenderCommandSuggestor(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.offset = -1;
     }
     

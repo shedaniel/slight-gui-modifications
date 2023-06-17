@@ -5,6 +5,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 import java.util.function.Consumer;
@@ -38,8 +39,8 @@ public class CoolOptionInstanceSliderButton<T> extends OptionInstance.OptionInst
     }
     
     @Override
-    public void render(PoseStack poseStack, int i, int j, float f) {
-        super.render(poseStack, i, j, f);
+    public void render(GuiGraphics graphics, int i, int j, float f) {
+        super.render(graphics, i, j, f);
         
         if (lastActive >= 0 && Util.getMillis() - this.lastActive > 500 && !isHovered) {
             applyNew();

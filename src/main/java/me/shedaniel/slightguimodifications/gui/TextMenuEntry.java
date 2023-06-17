@@ -1,9 +1,9 @@
 package me.shedaniel.slightguimodifications.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -46,9 +46,9 @@ public class TextMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
-        Minecraft.getInstance().font.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        if (selected) graphics.fill(x, y, x + width, y + 12, -12237499);
+        graphics.drawString(Minecraft.getInstance().font, text, x + 2, y + 2, selected ? 16777215 : 8947848, false);
     }
     
     @Override

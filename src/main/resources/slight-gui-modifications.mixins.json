@@ -6,11 +6,10 @@
   "client": [
     "MixinAbstractContainerScreen", "MixinAbstractSelectionList", "MixinAbstractSliderButton", "MixinBookEditScreen", "MixinChatScreen", "MixinCubeMapRenderer",
     "MixinOptionInstance", "MixinEditBox", "MixinGameRenderer", "MixinGui", "MixinGuiComponent", "MixinInventoryScreen", "MixinItemRenderer",
-    "MixinKeyboardHandler", "MixinMinecraft", "MixinOptionsScreen", "MixinRenderItemChangeY", "MixinScreen", "MixinScreenshot",
+    "MixinKeyboardHandler", "MixinLogoRenderer", "MixinMinecraft", "MixinOptionsScreen", "MixinRenderItemChangeY", "MixinScreen", "MixinScreenshot",
     "MixinServerSelectionList$OnlineServerEntry", "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance",
     "MixinWorldSelectionList$WorldListEntry", "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "modmenu.MixinModsScreen",
-    "rei.MixinOverlaySearchField", "rei.MixinRecipeViewingScreen", "rei.MixinREITextFieldWidget", "rei.MixinVillagerRecipeViewingScreen",
-    "MixinAbstractWidget"
+    "rei.MixinOverlaySearchField", "rei.MixinREITextFieldWidget", "MixinAbstractWidget"
   ],
   "injectors": {
     "defaultRequire": 1

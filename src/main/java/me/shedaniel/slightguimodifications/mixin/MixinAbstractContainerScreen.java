@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinAbstractContainerScreen {
     @ModifyArg(method = "renderSlotHighlight", index = 5,
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIIII)V",
+                        target = "Lnet/minecraft/client/gui/GuiGraphics;fillGradient(Lnet/minecraft/client/renderer/RenderType;IIIIIII)V",
                         ordinal = 0))
     private static int renderSlotHighlight1(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;
@@ -18,7 +18,7 @@ public class MixinAbstractContainerScreen {
     
     @ModifyArg(method = "renderSlotHighlight", index = 6,
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIIII)V",
+                        target = "Lnet/minecraft/client/gui/GuiGraphics;fillGradient(Lnet/minecraft/client/renderer/RenderType;IIIIIII)V",
                         ordinal = 0))
     private static int renderSlotHighlight2(int color) {
         return SlightGuiModifications.getGuiConfig().slotHighlight.enabled ? SlightGuiModifications.getGuiConfig().slotHighlight.color : color;

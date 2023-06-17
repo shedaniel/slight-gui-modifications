@@ -7,6 +7,7 @@ import me.shedaniel.slightguimodifications.gui.cts.elements.Text;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -30,7 +31,7 @@ public class LabelWidget extends AbstractWidget {
     }
     
     @Override
-    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraftClient = Minecraft.getInstance();
         Font textRenderer = minecraftClient.font;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
@@ -44,8 +45,8 @@ public class LabelWidget extends AbstractWidget {
         } else if (alignment == 2) {
             x -= textRenderer.width(getMessage());
         }
-        if (!hasShadow) textRenderer.draw(matrices, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24);
-        else textRenderer.drawShadow(matrices, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24);
+        if (!hasShadow) graphics.drawString(textRenderer, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24, false);
+        else graphics.drawString(textRenderer, this.getMessage(), x, this.getY(), j | Mth.ceil(this.alpha * 255.0F) << 24);
     }
     
     @Override

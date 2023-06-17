@@ -61,7 +61,7 @@ public abstract class MixinServerSelectionList$OnlineServerEntry {
                             new TextMenuEntry(I18n.get("selectServer.select"), () -> {
                                 ((MenuWidgetListener) screen).removeMenu();
                                 ServerData serverData = getServerData();
-                                ConnectScreen.startConnecting(this.screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData);
+                                ConnectScreen.startConnecting(this.screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
                             })
                     )
             ));

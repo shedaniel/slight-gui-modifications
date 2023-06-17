@@ -14,9 +14,9 @@ import me.shedaniel.slightguimodifications.gui.MenuWidget;
 import me.shedaniel.slightguimodifications.gui.TextMenuEntry;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
-import org.joml.Matrix4f;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,17 +33,17 @@ public class MixinOverlaySearchField extends TextFieldWidget {
     
     @Inject(method = "renderBorder",
             at = @At(value = "HEAD", remap = false), remap = false, cancellable = true)
-    private void renderBorder(PoseStack matrices, CallbackInfo ci) {
+    private void renderBorder(GuiGraphics graphics, CallbackInfo ci) {
         boolean border = hasBorder();
         if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
-            renderTextureBorder(matrices);
+            renderTextureBorder(graphics);
             ci.cancel();
         }
     }
     
     @Unique
-    private void renderTextureBorder(PoseStack matrices) {
-        RenderSystem.setShaderTexture(0, SlightGuiModifications.TEXT_FIELD_TEXTURE);
+    private void renderTextureBorder(GuiGraphics graphics) {
+        ResourceLocation texture = SlightGuiModifications.TEXT_FIELD_TEXTURE;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
@@ -52,28 +52,29 @@ public class MixinOverlaySearchField extends TextFieldWidget {
         // 9 Patch Texture
         
         // Four Corners
-        blit(matrices, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
-        blit(matrices, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
-        blit(matrices, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
-        blit(matrices, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
+        graphics.blit(texture, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
+        graphics.blit(texture, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
+        graphics.blit(texture, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
+        graphics.blit(texture, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
         
-        Matrix4f matrix = matrices.last().pose();
         // Sides
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        GuiComponent.innerBlit(matrix, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        GuiComponent.innerBlit(matrix, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
+        graphics.innerBlit(texture, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
+        graphics.innerBlit(texture, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
+        graphics.innerBlit(texture,  x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
+        graphics.innerBlit(texture, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
         
         // Center
-        GuiComponent.innerBlit(matrix, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
+        graphics.innerBlit(texture, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
     }
     
     @ModifyArg(method = "renderBorder",
                at = @At(value = "INVOKE",
-                        target = "Lme/shedaniel/rei/impl/client/gui/widget/search/OverlaySearchField;fill(Lcom/mojang/blaze3d/vertex/PoseStack;IIIII)V",
+                        target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
                         ordinal = 2),
-               index = 5)
-    private int modifyBackgroundColor(int color) {return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;}
+               index = 4)
+    private int modifyBackgroundColor(int color) {
+        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
+    }
     
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {

@@ -8,6 +8,7 @@ import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.impl.client.gui.InternalTextures;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 import java.util.Collections;
@@ -58,21 +59,20 @@ public class SubMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        if (selected) fill(matrices, x, y, x + width, y + 12, -12237499);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        if (selected) graphics.fill(x, y, x + width, y + 12, -12237499);
         if (selected && !entries.isEmpty()) {
             MenuWidget menu = getMenuWidget();
             menu.menuStartPoint.x = getParent().getBounds().getMaxX() - 1;
             menu.menuStartPoint.y = y - 1;
             List<Rectangle> areas = Lists.newArrayList(ScissorsHandler.INSTANCE.getScissorsAreas());
             ScissorsHandler.INSTANCE.clearScissors();
-            menu.render(matrices, mouseX, mouseY, delta);
+            menu.render(graphics, mouseX, mouseY, delta);
             for (Rectangle area : areas) ScissorsHandler.INSTANCE.scissor(area);
         }
-        Minecraft.getInstance().font.draw(matrices, text, x + 2, y + 2, selected ? 16777215 : 8947848);
+        graphics.drawString(Minecraft.getInstance().font, text, x + 2, y + 2, selected ? 16777215 : 8947848, false);
         if (!entries.isEmpty()) {
-            RenderSystem.setShaderTexture(0, InternalTextures.CHEST_GUI_TEXTURE);
-            blit(matrices, x + width - 15, y - 2, 0, 28, 18, 18);
+            graphics.blit(InternalTextures.CHEST_GUI_TEXTURE, x + width - 15, y - 2, 0, 28, 18, 18);
         }
     }
     

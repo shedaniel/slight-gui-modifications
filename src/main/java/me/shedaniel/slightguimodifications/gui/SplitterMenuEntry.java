@@ -3,6 +3,8 @@ package me.shedaniel.slightguimodifications.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Collections;
 import java.util.List;
+
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 public class SplitterMenuEntry extends MenuEntry {
@@ -29,8 +31,8 @@ public class SplitterMenuEntry extends MenuEntry {
     }
     
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        fillGradient(matrices, x + 3, y + 2, x + width - 3, y + 3, -7829368, -7829368);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        graphics.fillGradient(x + 3, y + 2, x + width - 3, y + 3, -7829368, -7829368);
     }
     
     @Override

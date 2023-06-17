@@ -7,6 +7,7 @@ import com.terraformersmc.modmenu.gui.widget.ModListWidget;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +24,7 @@ public abstract class MixinModListWidget extends AbstractSelectionList {
     
     @Inject(method = "renderList",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;begin(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;)V"))
-    private void preSelectionBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void preSelectionBufferDraw(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
 //        RenderSystem.disableAlphaTest();
@@ -37,7 +38,7 @@ public abstract class MixinModListWidget extends AbstractSelectionList {
     
     @Inject(method = "renderList",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/Tesselator;end()V", shift = At.Shift.AFTER))
-    private void postSelectionBufferDraw(PoseStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void postSelectionBufferDraw(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 //        RenderSystem.popMatrix();
         SlightGuiModifications.restoreAlpha();
     }

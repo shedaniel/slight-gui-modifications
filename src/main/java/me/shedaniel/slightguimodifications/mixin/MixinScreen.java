@@ -1,6 +1,5 @@
 package me.shedaniel.slightguimodifications.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.slightguimodifications.SlightGuiModifications;
 import me.shedaniel.slightguimodifications.config.SlightGuiModificationsConfig;
 import me.shedaniel.slightguimodifications.gui.MenuWidget;
@@ -8,6 +7,7 @@ import me.shedaniel.slightguimodifications.listener.AnimationListener;
 import me.shedaniel.slightguimodifications.listener.MenuWidgetListener;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -147,26 +147,26 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     }
     
     @Redirect(method = "renderBackground",
-              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;fillGradient(Lcom/mojang/blaze3d/vertex/PoseStack;IIIIII)V"))
-    private void fillGradientRedirect(PoseStack matrices, int top, int left, int right, int bottom, int color1, int color2) {
+              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fillGradient(IIIIII)V"))
+    private void fillGradientRedirect(GuiGraphics graphics, int top, int left, int right, int bottom, int color1, int color2) {
         if (this.renderingState == 2) {
             float alpha = slightguimodifications_getEasedYOffset();
             this.renderingState = 0;
             if (alpha >= 0) {
                 SlightGuiModifications.backgroundTint = Math.min(SlightGuiModifications.backgroundTint + minecraft.getDeltaFrameTime() * 8, SlightGuiModifications.getSpeed() / 20f);
                 float f = Math.min(SlightGuiModifications.backgroundTint / SlightGuiModifications.getSpeed() * 20f, 1f);
-                fillGradient(matrices, top, SlightGuiModifications.reverseYAnimation(left), right, SlightGuiModifications.reverseYAnimation(bottom),
+                graphics.fillGradient(top, SlightGuiModifications.reverseYAnimation(left), right, SlightGuiModifications.reverseYAnimation(bottom),
                         color1 & 16777215 | Mth.ceil(f * (float) (color1 >> 24 & 255)) << 24,
                         color2 & 16777215 | Mth.ceil(f * (float) (color2 >> 24 & 255)) << 24);
-            } else fillGradient(matrices, top, left, right, bottom, color1, color2);
+            } else graphics.fillGradient(top, left, right, bottom, color1, color2);
             this.renderingState = 2;
-        } else fillGradient(matrices, top, left, right, bottom, color1, color2);
+        } else graphics.fillGradient(top, left, right, bottom, color1, color2);
     }
     
     
     @Inject(method = "renderDirtBackground",
             at = @At(value = "HEAD"))
-    private void preRenderDirtBackground(PoseStack poseStack, CallbackInfo ci) {
+    private void preRenderDirtBackground(GuiGraphics graphics, CallbackInfo ci) {
         if (this.renderingState == 2) {
             this.renderingState = 0;
         }
@@ -174,7 +174,7 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     
     @Inject(method = "renderDirtBackground",
             at = @At("RETURN"))
-    private void postRenderDirtBackground(PoseStack poseStack, CallbackInfo ci) {
+    private void postRenderDirtBackground(GuiGraphics graphics, CallbackInfo ci) {
         this.renderingState = 2;
     }
     
