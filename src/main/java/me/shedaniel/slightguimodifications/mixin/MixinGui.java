@@ -77,12 +77,12 @@ public class MixinGui {
 
             var shaderColorPrev = RenderSystem.getShaderColor();
             shaderColorPrev = new float[]
-                    {
-                            shaderColorPrev[0],
-                            shaderColorPrev[1],
-                            shaderColorPrev[2],
-                            shaderColorPrev[3]
-                    };
+            {
+                    shaderColorPrev[0],
+                    shaderColorPrev[1],
+                    shaderColorPrev[2],
+                    shaderColorPrev[3]
+            };
             float[] finalShaderColorPrev = shaderColorPrev;
 
             double beneficialOffset = 0;
