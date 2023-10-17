@@ -58,7 +58,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     public abstract void insertText(String text);
     
     @Shadow
-    public abstract void moveCursorToEnd();
+    public abstract void moveCursorToEnd(boolean bl);
     
     @Shadow
     public abstract void setHighlightPos(int i);
@@ -84,61 +84,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     private void preRenderButton(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         this.lastMatrices = graphics;
     }
-    
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z", ordinal = 0))
-    private boolean isBordered(EditBox textFieldWidget) {
-        boolean border = isBordered();
-        if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
-            renderTextureBorder();
-            return false;
-        }
-        return border;
-    }
-    
-    @Unique
-    private void renderTextureBorder() {
-        ResourceLocation texture = SlightGuiModifications.TEXT_FIELD_TEXTURE;
-        RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderSystem.blendFunc(770, 771);
-        // 9 Patch Texture
-        
-        // Four Corners
-        int x = getX(), y = getY();
-        lastMatrices.blit(texture, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
-        lastMatrices.blit(texture, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
-        lastMatrices.blit(texture, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
-        lastMatrices.blit(texture, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
-        
-        // Sides
-        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        lastMatrices.innerBlit(texture, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        lastMatrices.innerBlit(texture, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
-        
-        // Center
-        lastMatrices.innerBlit(texture, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
-        this.lastMatrices = null;
-    }
-    
-    @ModifyArg(method = "renderWidget",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
-                        ordinal = 0),
-               index = 4)
-    private int modifyBorderColor(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
-    }
-    
-    @ModifyArg(method = "renderWidget",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
-                        ordinal = 1),
-               index = 4)
-    private int modifyBackgroundColor(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
-    }
-    
+
     @Inject(method = "renderHighlight", at = @At("HEAD"), cancellable = true)
     private void drawSelectionHighlight(GuiGraphics graphics, int x1, int y1, int x2, int y2, CallbackInfo ci) {
         if (!SlightGuiModifications.getGuiConfig().textFieldModifications.enabled || SlightGuiModifications.getGuiConfig().textFieldModifications.selectionMode != SlightGuiModificationsConfig.Gui.TextFieldModifications.SelectionMode.HIGHLIGHT)
@@ -230,7 +176,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
     private List<MenuEntry> createNonSelectingNotEditableMenu() {
         return ImmutableList.of(
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
+                    this.moveCursorToEnd(false);
                     this.setHighlightPos(0);
                     removeSelfMenu();
                 })
@@ -247,7 +193,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
+                    this.moveCursorToEnd(false);
                     this.setHighlightPos(0);
                     removeSelfMenu();
                 })
@@ -262,7 +208,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
+                    this.moveCursorToEnd(false);
                     this.setHighlightPos(0);
                     removeSelfMenu();
                 }),
@@ -294,7 +240,7 @@ public abstract class MixinEditBox extends AbstractWidget implements Renderable,
                     removeSelfMenu();
                 }),
                 new TextMenuEntry(I18n.get("text.slightguimodifications.selectAll"), () -> {
-                    this.moveCursorToEnd();
+                    this.moveCursorToEnd(false);
                     this.setHighlightPos(0);
                     removeSelfMenu();
                 }),

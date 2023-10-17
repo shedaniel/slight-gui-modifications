@@ -60,30 +60,11 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
         public static class TextFieldModifications {
             @Comment("Whether this module is enabled.")
             public boolean enabled = false;
-            @Comment(
-                    "Set to Color to use the Border and Background Color.\nSet to Texture to use resource pack:\n/assets/minecraft/textures/gui/text_field.png\n\nMore documentations on website.")
-            @ConfigEntry.Gui.Tooltip(count = 6)
-            @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-            public BackgroundMode backgroundMode = BackgroundMode.COLOR;
-            @ConfigEntry.ColorPicker
-            public int borderColor = 0xa0a0a0;
-            @ConfigEntry.ColorPicker
-            public int backgroundColor = 0x000000;
             @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
             public SelectionMode selectionMode = SelectionMode.INVERT;
             @Comment("Whether Text Fields should allow right click actions.")
             @ConfigEntry.Gui.Tooltip() public boolean rightClickActions = false;
-            
-            public enum BackgroundMode implements SelectionListEntry.Translatable {
-                COLOR,
-                TEXTURE;
-                
-                @Override
-                public @NotNull String getKey() {
-                    return "text.autoconfig.slightguimodifications.option.gui.textFieldModifications.backgroundMode." + name().toLowerCase(Locale.ROOT);
-                }
-            }
-            
+
             public enum SelectionMode implements SelectionListEntry.Translatable {
                 INVERT,
                 HIGHLIGHT;
@@ -99,10 +80,6 @@ public class SlightGuiModificationsConfig extends PartitioningSerializer.GlobalD
             @Comment("Whether this module is enabled.")
             public boolean enabled = false;
             public int grabberWidth = 8;
-            @Comment(
-                    "Whether to use custom texture:\n/assets/slightguimodifications/textures/gui/slider(_hovered).png\nor\n/config/slightguimodifications/slider(_hovered).png")
-            @ConfigEntry.Gui.Tooltip(count = 4)
-            public boolean customBackgroundTexture = false;
         }
         
         public static class DebugInformation {

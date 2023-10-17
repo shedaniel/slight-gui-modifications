@@ -67,68 +67,7 @@ public abstract class MixinREITextFieldWidget extends WidgetWithBounds implement
     
     @Shadow(remap = false)
     public abstract void setText(String string_1);
-    
-    @Inject(method = "renderBorder",
-            at = @At(value = "HEAD"), remap = false, cancellable = true)
-    private void renderBorder(GuiGraphics graphics, CallbackInfo ci) {
-        boolean border = hasBorder();
-        if (border && SlightGuiModifications.getGuiConfig().textFieldModifications.enabled && SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundMode == SlightGuiModificationsConfig.Gui.TextFieldModifications.BackgroundMode.TEXTURE) {
-            renderTextureBorder(graphics);
-            ci.cancel();
-        }
-    }
-    
-    @Unique
-    private void renderTextureBorder(GuiGraphics graphics) {
-        ResourceLocation texture = SlightGuiModifications.TEXT_FIELD_TEXTURE;
-        RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderSystem.blendFunc(770, 771);
-        int x = bounds.x, y = bounds.y, width = bounds.width, height = bounds.height;
-        // 9 Patch Texture
-        
-        // Four Corners
-        graphics.blit(texture, x - 1, y - 1, 0, 0, 0, 8, 8, 256, 256);
-        graphics.blit(texture, x + width - 7, y - 1, 0, 248, 0, 8, 8, 256, 256);
-        graphics.blit(texture, x - 1, y + height - 7, 0, 0, 248, 8, 8, 256, 256);
-        graphics.blit(texture, x + width - 7, y + height - 7, 0, 248, 248, 8, 8, 256, 256);
-        
-        // Sides
-        graphics.innerBlit(texture, x + 7, x + width - 7, y - 1, y + 7, 0, (8) / 256f, (248) / 256f, (0) / 256f, (8) / 256f);
-        graphics.innerBlit(texture, x + 7, x + width - 7, y + height - 7, y + height + 1, 0, (8) / 256f, (248) / 256f, (248) / 256f, (256) / 256f);
-        graphics.innerBlit(texture, x - 1, x + 7, y + 7, y + height - 7, 0, (0) / 256f, (8) / 256f, (8) / 256f, (248) / 256f);
-        graphics.innerBlit(texture, x + width - 7, x + width + 1, y + 7, y + height - 7, 0, (248) / 256f, (256) / 256f, (8) / 256f, (248) / 256f);
-        
-        // Center
-        graphics.innerBlit(texture, x + 7, x + width - 7, y + 7, y + height - 7, 0, (8) / 256f, (248) / 256f, (8) / 256f, (248) / 256f);
-    }
-    
-    @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
-                        ordinal = 1),
-               index = 4)
-    private int modifyBorderColor(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.borderColor | 255 << 24 : color;
-    }
-    
-    @ModifyArg(method = "renderBorder",
-               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
-                        ordinal = 0),
-               index = 4)
-    private int modifyBackgroundColor(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
-    }
-    
-    @ModifyArg(method = "renderBorder",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
-                    ordinal = 2),
-            index = 4)
-    private int modifyBackgroundColor2(int color) {
-        return SlightGuiModifications.getGuiConfig().textFieldModifications.enabled ? SlightGuiModifications.getGuiConfig().textFieldModifications.backgroundColor | 255 << 24 : color;
-    }
-    
+
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void preMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (getBounds().contains(mouseX, mouseY) && this.isVisible() && SlightGuiModifications.getGuiConfig().textFieldModifications.rightClickActions && button == 1 && !((Object) this instanceof OverlaySearchField)) {

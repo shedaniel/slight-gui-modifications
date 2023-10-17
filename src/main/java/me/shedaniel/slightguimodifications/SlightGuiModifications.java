@@ -83,7 +83,6 @@ public class SlightGuiModifications implements ClientModInitializer {
     }
     
     public static void setAlpha(float alpha) {
-        if (lastAlpha >= 0) new IllegalStateException().printStackTrace();
         float[] colorObj = getColorObj();
         float colorRed = getColorRed(colorObj);
         float colorGreen = getColorGreen(colorObj);
