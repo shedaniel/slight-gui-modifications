@@ -91,7 +91,6 @@ public abstract class MixinAbstractSliderButton extends AbstractWidget {
             }
         }
 
-        //TODO
         graphics.blitSprite(los, i, j, k, l);
     }
 }
