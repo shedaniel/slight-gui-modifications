@@ -9,7 +9,7 @@
     "MixinKeyboardHandler", "MixinLogoRenderer", "MixinMinecraft", "MixinOptionsScreen", "MixinRenderItemChangeY", "MixinScreen", "MixinScreenshot",
     "MixinServerSelectionList$OnlineServerEntry", "MixinSplashManager", "MixinTextRenderer", "MixinTitleScreen", "MixinToastComponent$ToastInstance",
     "MixinWorldSelectionList$WorldListEntry", "TitleScreenHooks", "cloth.MixinScissorsHandlerImpl", "modmenu.MixinModListWidget", "rei.MixinOverlaySearchField",
-    "rei.MixinREITextFieldWidget", "MixinAbstractWidget"
+    "rei.MixinREITextFieldWidget"
   ],
   "injectors": {
     "defaultRequire": 1

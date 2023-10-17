@@ -69,12 +69,6 @@ public abstract class MixinAbstractSliderButton extends AbstractWidget {
         if (config.sliderModifications.enabled) {
             int grabberWidth = config.sliderModifications.grabberWidth;
             if (grabberWidth != 8) {
-                var handleLocation = new ResourceLocation("minecraft:textures/gui/sprites/widget/slider_handle.png");
-                var handleHighlightLocation = new ResourceLocation("minecraft:textures/gui/sprites/widget/slider_handle_highlighted.png");
-                var finalLocation = this.isHoveredOrFocused() ? handleHighlightLocation : handleLocation;
-
-                RenderSystem.setShaderTexture(0, finalLocation);
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 graphics.blitSprite(this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
                 graphics.blitSprite(this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - grabberWidth)), this.getY(), grabberWidth, 20);
             }
