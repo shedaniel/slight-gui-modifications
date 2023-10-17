@@ -81,9 +81,9 @@ public class SubMenuEntry extends MenuEntry {
         if (rendering && mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY < y + 12) return true;
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    
+
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {return menuWidget != null && !menuWidget.children().isEmpty() && selected && menuWidget.mouseScrolled(mouseX, mouseY, amount);}
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount, double g) {return menuWidget != null && !menuWidget.children().isEmpty() && selected && menuWidget.mouseScrolled(mouseX, mouseY, amount, g);}
     
     @Override
     public List<? extends GuiEventListener> children() {

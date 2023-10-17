@@ -13,14 +13,15 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinAbstractWidget {
     @Unique
     private static final ResourceLocation US_WIDGETS_LOCATION = new ResourceLocation("textures/gui/widgets_original.png");
-    
+
     @ModifyArg(method = "renderWidget",
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/GuiGraphics;blitNineSliced(Lnet/minecraft/resources/ResourceLocation;IIIIIIIIII)V"))
+                        target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"))
     private ResourceLocation modifyId(ResourceLocation id) {
-        if ((Object) this instanceof MerchantScreen.TradeOfferButton && id == AbstractWidget.WIDGETS_LOCATION) {
-            return US_WIDGETS_LOCATION;
-        }
+        //TODO
+        //if ((Object) this instanceof MerchantScreen.TradeOfferButton && id == AbstractWidget.WIDGETS_LOCATION) {
+        //    return US_WIDGETS_LOCATION;
+        //}
         return id;
     }
 }

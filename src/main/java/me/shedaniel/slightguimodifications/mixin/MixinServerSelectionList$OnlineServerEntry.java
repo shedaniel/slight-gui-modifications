@@ -42,7 +42,7 @@ public abstract class MixinServerSelectionList$OnlineServerEntry {
                             new TextMenuEntry(I18n.get("selectServer.edit"), () -> {
                                 ((MenuWidgetListener) screen).removeMenu();
                                 ServerData serverInfo = getServerData();
-                                screen.editingServer = new ServerData(serverInfo.name, serverInfo.ip, false);
+                                screen.editingServer = new ServerData(serverInfo.name, serverInfo.ip, serverInfo.isLan() ? ServerData.Type.LAN : serverInfo.isRealm() ? ServerData.Type.REALM : ServerData.Type.OTHER);
                                 screen.editingServer.copyFrom(serverInfo);
                                 this.minecraft.setScreen(new EditServerScreen(screen, screen::editServerCallback, screen.editingServer));
                             }),

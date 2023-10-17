@@ -32,7 +32,8 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     @Shadow
     public int height;
     
-    @Shadow @Final protected List<GuiEventListener> children;
+    @Shadow @Final private List<GuiEventListener> children;
+
     @Shadow protected Minecraft minecraft;
     @Unique
     private long fadeStart = -1;
@@ -145,8 +146,8 @@ public abstract class MixinScreen extends AbstractContainerEventHandler implemen
     public void slightguimodifications_setCurrentFade(long currentFade) {
         this.currentFade = currentFade;
     }
-    
-    @Redirect(method = "renderBackground",
+
+    @Redirect(method = "renderTransparentBackground",
               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fillGradient(IIIIII)V"))
     private void fillGradientRedirect(GuiGraphics graphics, int top, int left, int right, int bottom, int color1, int color2) {
         if (this.renderingState == 2) {

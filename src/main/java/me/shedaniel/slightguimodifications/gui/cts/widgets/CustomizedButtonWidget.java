@@ -36,7 +36,7 @@ public class CustomizedButtonWidget extends Button {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
-            graphics.blitNineSliced(textureId, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, this.getTextureY());
+            graphics.blitSprite(textureId, this.getX(), this.getY(), this.getWidth(), this.getHeight());
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             int j = this.active ? 16777215 : 10526880;
             graphics.drawCenteredString(textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, j | Mth.ceil(this.alpha * 255.0F) << 24);
